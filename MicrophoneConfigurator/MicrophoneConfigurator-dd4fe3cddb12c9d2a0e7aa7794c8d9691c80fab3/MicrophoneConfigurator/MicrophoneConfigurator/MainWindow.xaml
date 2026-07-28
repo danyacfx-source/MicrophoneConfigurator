@@ -66,7 +66,7 @@
                                  Fill="{DynamicResource SuccessBrush}"
                                  Margin="0,0,10,0">
                             <Ellipse.Effect>
-                                <DropShadowEffect Color="{DynamicResource SuccessColor}"
+                                <DropShadowEffect Color="{DynamicResource SuccessBrush}"
                                                   ShadowDepth="0" BlurRadius="12" Opacity="0.6"/>
                         </Ellipse.Effect>
                         </Ellipse>
@@ -247,8 +247,8 @@
                                                 CornerRadius="4">
                                             <Border.Background>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                    <GradientStop Color="{DynamicResource WarningColor}" Offset="0"/>
-                                                    <GradientStop Color="{DynamicResource DangerColor}" Offset="1"/>
+                                                    <GradientStop Color="{DynamicResource WarningBrush}" Offset="0"/>
+                                                    <GradientStop Color="{DynamicResource DangerBrush}" Offset="1"/>
                                                 </LinearGradientBrush>
                                             </Border.Background>
                                         </Border>
@@ -1111,7 +1111,7 @@
                              Margin="0,0,8,0"
                              VerticalAlignment="Center">
                         <Ellipse.Effect>
-                            <DropShadowEffect Color="{DynamicResource SuccessColor}"
+                            <DropShadowEffect Color="{DynamicResource SuccessBrush}"
                                               ShadowDepth="0" BlurRadius="8" Opacity="0.5"/>
                         </Ellipse.Effect>
                     </Ellipse>
