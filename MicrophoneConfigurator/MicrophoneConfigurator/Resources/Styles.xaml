@@ -261,9 +261,9 @@
     <!-- Card Style -->
     <Style x:Key="CardBorder" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource CardBrush}"/>
-        <Setter Property="CornerRadius" Value="16"/>
-        <Setter Property="Padding" Value="20"/>
-        <Setter Property="Margin" Value="8"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
     </Style>
 
     <!-- Modern Slider -->
