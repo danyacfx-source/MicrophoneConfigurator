@@ -1,1133 +1,679 @@
 <Window x:Class="MicrophoneConfigurator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:MicrophoneConfigurator"
-        xmlns:vm="clr-namespace:MicrophoneConfigurator.Core"
-        Title="MicStudio Pro" Height="800" Width="1100" MinHeight="600" MinWidth="900"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        ResizeMode="CanResizeWithGrip"
-        KeyDown="Window_KeyDown" Closing="Window_Closing" StateChanged="Window_StateChanged">
+        xmlns:vm="clr-namespace:MicrophoneConfigurator.ViewModels"
+        xmlns:vc="clr-namespace:MicrophoneConfigurator.Core"
+        Title="MicStudio Pro"
+        Height="820" Width="1100"
+        MinHeight="600" MinWidth="900"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResize"
+        KeyDown="Window_KeyDown"
+        Closing="Window_Closing"
+        StateChanged="Window_StateChanged">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <DataTemplate DataType="{x:Type vm:EqualizerBandModel}">
-            <Grid Margin="0,4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="60"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding FrequencyLabel}"
-                       Foreground="{DynamicResource TextPrimaryBrush}"
-                       VerticalAlignment="Center" HorizontalAlignment="Left"
-                       Margin="0,0,8,0" FontSize="11"/>
-                <Slider Grid.Column="1"
-                        Style="{DynamicResource PurpleSlider}"
-                        Minimum="-12" Maximum="12"
-                        Value="{Binding Gain, Mode=TwoWay}"
-                        ToolTip="{Binding FrequencyLabel, StringFormat='Регулировка {0}'}"
-                        VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2"
-                           Text="{Binding Gain, StringFormat='{}{0:F1} dB'}"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           VerticalAlignment="Center" HorizontalAlignment="Right"
-                           FontSize="11"/>
+        <DataTemplate DataType="{x:Type vc:EqualizerBandModel}">
+            <Grid Margin="0,0,0,6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding FrequencyLabel}" Foreground="#FFB0B0D0" FontSize="9" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                <Slider Grid.Row="1" Minimum="-12" Maximum="12" Value="{Binding Gain}"
+                        Orientation="Vertical" HorizontalAlignment="Center"
+                        Width="18" Height="100" Style="{StaticResource PurpleSlider}"
+                        ToolTip="{Binding FrequencyLabel}"/>
+                <TextBlock Grid.Row="2" Text="{Binding GainDisplay}" Foreground="#FF8080C0" FontSize="8"
+                           HorizontalAlignment="Center" Margin="0,2,0,0"/>
             </Grid>
         </DataTemplate>
     </Window.Resources>
 
-    <Border Background="{DynamicResource BgDarkBrush}"
-            CornerRadius="16"
-            BorderBrush="#2A2A5A"
-            BorderThickness="1"
-            Effect="{DynamicResource DropShadowEffect}">
+    <Border Background="#FF0A0A1A" CornerRadius="14" BorderBrush="#2A2A5A" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="48"/>
+                <RowDefinition Height="40"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
 
-            <!-- ═══════════════════ TITLE BAR ═══════════════════ -->
-            <Border Grid.Row="0"
-                    Background="{DynamicResource BgMidBrush}"
-                    CornerRadius="16,16,0,0"
-                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <!-- ============================================ -->
+            <!-- TITLE BAR (Row 0)                            -->
+            <!-- ============================================ -->
+            <Grid Grid.Row="0" Background="#FF0C0C24" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Left: logo + title -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <Ellipse Width="12" Height="12"
-                                 Fill="{DynamicResource SuccessBrush}"
-                                 Margin="0,0,10,0">
-                            <Ellipse.Effect>
-                                <DropShadowEffect Color="{DynamicResource SuccessColor}"
-                                                  ShadowDepth="0" BlurRadius="12" Opacity="0.6"/>
-                        </Ellipse.Effect>
-                        </Ellipse>
-                        <TextBlock Text="MICSTUDIO PRO"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                   FontSize="13" FontWeight="Bold"
-                                   VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <Ellipse Width="8" Height="8" Fill="#FF00E676" Margin="0,0,8,0"/>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="MICSTUDIO" Foreground="#FFB0B0D0" FontSize="9" FontWeight="Bold"/>
+                        <TextBlock Text="PRO" Foreground="#FF6A6AA0" FontSize="7" FontWeight="SemiBold" Margin="0,-2,0,0"/>
                     </StackPanel>
+                </StackPanel>
 
-                    <!-- Right: window buttons -->
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center"
-                                Margin="0,0,10,0">
-                        <Button Content="─"
-                                Style="{DynamicResource ModernButton}"
-                                Width="36" Height="28"
-                                FontSize="14"
-                                ToolTip="Свернуть в трей"
-                                Click="MinimizeBtn_Click"/>
-                        <Button Content="🖥"
-                                Style="{DynamicResource ModernButton}"
-                                Width="36" Height="28"
-                                FontSize="14"
-                                Margin="4,0,0,0"
-                                ToolTip="Свернуть в системный трей"
-                                Click="TrayBtn_Click"/>
-                        <Button Content="✕"
-                                Style="{DynamicResource DangerButton}"
-                                Width="36" Height="28"
-                                FontSize="14"
-                                Margin="4,0,0,0"
-                                ToolTip="Закрыть приложение"
-                                Click="CloseBtn_Click"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
+                    <Button x:Name="MinimizeBtn" Content="&#xE921;" FontFamily="Segoe MDL2 Assets"
+                            FontSize="12" Width="28" Height="28"
+                            Style="{StaticResource ModernButton}" Click="MinimizeBtn_Click"
+                            ToolTip="Свернуть" Margin="2,0"/>
+                    <Button x:Name="TrayBtn" Content="&#xE83F;" FontFamily="Segoe MDL2 Assets"
+                            FontSize="12" Width="28" Height="28"
+                            Style="{StaticResource ModernButton}" Click="TrayBtn_Click"
+                            ToolTip="Свернуть в трей" Margin="2,0"/>
+                    <Button x:Name="CloseBtn" Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets"
+                            FontSize="12" Width="28" Height="28"
+                            Style="{StaticResource DangerButton}" Click="CloseBtn_Click"
+                            ToolTip="Закрыть" Margin="2,0"/>
+                </StackPanel>
+            </Grid>
 
-            <!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+            <!-- ============================================ -->
+            <!-- MAIN CONTENT (Row 1)                         -->
+            <!-- ============================================ -->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="180"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- ─────── LEFT SIDEBAR ─────── -->
-                <Border Grid.Column="0"
-                        Background="{DynamicResource BgMidBrush}"
-                        CornerRadius="12"
-                        Margin="6,6,0,6"
-                        Padding="8">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled">
+                <!-- SIDEBAR (Column 0) -->
+                <Border Grid.Column="0" Background="#FF0C0C24" BorderThickness="0,0,1,0" BorderBrush="#2A2A5A">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="6,8,6,8">
                         <StackPanel>
 
-                            <!-- VU METER -->
-                            <Border Background="{DynamicResource BgDarkBrush}"
-                                    CornerRadius="8"
-                                    Padding="8" Margin="0,0,0,8">
+                            <!-- VU Meter Card -->
+                            <Border Background="#FF16163A" CornerRadius="8" Padding="8" Margin="0,0,0,6">
                                 <StackPanel>
-                                    <TextBlock Text="УРОВЕНЬ"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="9" FontWeight="Bold"
-                                               HorizontalAlignment="Center"
-                                               Margin="0,0,0,6"/>
-                                    <Grid Height="150">
+                                    <TextBlock Text="VU МЕТР" Foreground="#FFB0B0D0" FontSize="9" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                    <Grid Margin="0,0,0,3">
                                         <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-
-                                        <!-- Left Channel -->
-                                        <Border Grid.Column="0"
-                                                Background="{DynamicResource BgDarkBrush}"
-                                                CornerRadius="4"
-                                                Margin="0,0,3,0"
-                                                ClipToBounds="True">
+                                        <TextBlock Grid.Column="0" Text="L" Foreground="#FF8080B0" FontSize="8" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <Border Grid.Column="1" Background="#FF0A0A1A" CornerRadius="3" Height="8" HorizontalAlignment="Stretch">
                                             <Grid>
-                                                <Border x:Name="VuLeftBar"
-                                                        VerticalAlignment="Bottom"
-                                                        Height="0">
-                                                    <Border.Background>
-                                                        <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                                            <GradientStop Color="#00C853" Offset="0"/>
-                                                            <GradientStop Color="#FFEB3B" Offset="0.6"/>
-                                                            <GradientStop Color="#FF5722" Offset="0.85"/>
-                                                            <GradientStop Color="#FF1744" Offset="1"/>
-                                                        </LinearGradientBrush>
-                                                    </Border.Background>
-                                                </Border>
-                                                <Border x:Name="VuLeftPeak"
-                                                        VerticalAlignment="Bottom"
-                                                        Height="2" Background="White"
-                                                        Margin="0,0,0,0"/>
+                                                <Border x:Name="VuLeftBar" HorizontalAlignment="Left" Background="#FF00E676" CornerRadius="3" Height="8" Width="0"/>
+                                                <Border x:Name="VuLeftPeak" HorizontalAlignment="Left" Background="#FFFF5252" CornerRadius="1" Height="8" Width="1" Margin="0"/>
                                             </Grid>
                                         </Border>
-
-                                        <!-- Right Channel -->
-                                        <Border Grid.Column="1"
-                                                Background="{DynamicResource BgDarkBrush}"
-                                                CornerRadius="4"
-                                                Margin="3,0,0,0"
-                                                ClipToBounds="True">
+                                        <TextBlock Grid.Column="2" x:Name="VuPeakLabel" Text="0.0" Foreground="#FF8080B0" FontSize="7" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="R" Foreground="#FF8080B0" FontSize="8" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <Border Grid.Column="1" Background="#FF0A0A1A" CornerRadius="3" Height="8" HorizontalAlignment="Stretch">
                                             <Grid>
-                                                <Border x:Name="VuRightBar"
-                                                        VerticalAlignment="Bottom"
-                                                        Height="0">
-                                                    <Border.Background>
-                                                        <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                                            <GradientStop Color="#00C853" Offset="0"/>
-                                                            <GradientStop Color="#FFEB3B" Offset="0.6"/>
-                                                            <GradientStop Color="#FF5722" Offset="0.85"/>
-                                                            <GradientStop Color="#FF1744" Offset="1"/>
-                                                        </LinearGradientBrush>
-                                                    </Border.Background>
-                                                </Border>
-                                                <Border x:Name="VuRightPeak"
-                                                        VerticalAlignment="Bottom"
-                                                        Height="2" Background="White"
-                                                        Margin="0,0,0,0"/>
+                                                <Border x:Name="VuRightBar" HorizontalAlignment="Left" Background="#FF00E676" CornerRadius="3" Height="8" Width="0"/>
+                                                <Border x:Name="VuRightPeak" HorizontalAlignment="Left" Background="#FFFF5252" CornerRadius="1" Height="8" Width="1"/>
                                             </Grid>
                                         </Border>
-
-                                        <!-- Peak label overlay -->
-                                        <TextBlock x:Name="VuPeakLabel"
-                                                   Text="0.0 dB"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   Background="{DynamicResource BgDarkBrush}"
-                                                   Padding="4,2"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
 
-                            <!-- MASTER VOLUME -->
-                            <Border Style="{DynamicResource CardBorder}"
-                                    Padding="8" Margin="0,0,0,8">
+                            <!-- Master Volume Card -->
+                            <Border Background="#FF16163A" CornerRadius="8" Padding="8" Margin="0,0,0,6">
                                 <StackPanel>
-                                    <TextBlock Text="МАСТЕР ГРОМКОСТЬ"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="9" FontWeight="Bold"
-                                               Margin="0,0,0,4"/>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="40"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Slider x:Name="MasterVolumeSlider"
-                                                Style="{DynamicResource ModernSlider}"
-                                                Minimum="0" Maximum="2" Value="1"
-                                                ToolTip="Регулировка общей громкости вывода"/>
-                                        <TextBlock Grid.Column="1"
-                                                   x:Name="VolumeDisplayText"
-                                                   Text="100%"
-                                                   Foreground="{DynamicResource AccentBrush}"
-                                                   FontSize="11" FontWeight="SemiBold"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"/>
-                                    </Grid>
+                                    <TextBlock Text="МАСТЕР" Foreground="#FFB0B0D0" FontSize="9" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <Slider x:Name="MasterVolumeSlider" Minimum="0" Maximum="100" Value="75"
+                                            Style="{StaticResource ModernSlider}" Margin="0,0,0,2"
+                                            ToolTip="Громкость основного выхода"/>
+                                    <TextBlock x:Name="VolumeDisplayText" Text="75%" Foreground="#FF8080C0" FontSize="8" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
-                            <!-- GAIN REDUCTION METER -->
-                            <Border Style="{DynamicResource CardBorder}"
-                                    Padding="8" Margin="0,0,0,8">
+                            <!-- Gain Reduction Meter Card -->
+                            <Border Background="#FF16163A" CornerRadius="8" Padding="8" Margin="0,0,0,6">
                                 <StackPanel>
-                                    <TextBlock Text="СНИЖЕНИЕ УСИЛЕНИЯ"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="10" FontWeight="Bold"
-                                               Margin="0,0,0,6"/>
-                                    <Border Height="16" CornerRadius="4" ClipToBounds="True">
+                                    <TextBlock Text="СНИЖЕНИЕ" Foreground="#FFB0B0D0" FontSize="9" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <Border Background="#FF0A0A1A" CornerRadius="3" Height="8" Margin="0,0,0,3">
                                         <Grid>
-                                        <Border x:Name="GainReductionBar"
-                                                HorizontalAlignment="Left"
-                                                Width="0"
-                                                CornerRadius="4">
-                                            <Border.Background>
-                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                    <GradientStop Color="{DynamicResource WarningColor}" Offset="0"/>
-                                                    <GradientStop Color="{DynamicResource DangerColor}" Offset="1"/>
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                        </Border>
-                                        <TextBlock x:Name="GainReductionLabel"
-                                                   Text="0.0 dB"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                                   FontSize="9"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"/>
+                                            <Border x:Name="GainReductionBar" HorizontalAlignment="Left" Background="#FFFFAB40" CornerRadius="3" Height="8" Width="0"/>
                                         </Grid>
                                     </Border>
+                                    <TextBlock x:Name="GainReductionLabel" Text="0.0 dB" Foreground="#FF8080B0" FontSize="8" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
-                            <!-- NOISE GATE -->
-                            <Border Style="{DynamicResource CardBorder}"
-                                    Padding="8" Margin="0,0,0,8">
+                            <!-- Noise Gate Card -->
+                            <Border Background="#FF16163A" CornerRadius="8" Padding="8" Margin="0,0,0,6">
                                 <StackPanel>
-                                    <Grid Margin="0,0,0,4">
-                                        <TextBlock Text="ШУМОВАЯ ДВЕРЬ"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="9" FontWeight="Bold"
-                                                   VerticalAlignment="Center"/>
-                                        <ToggleButton x:Name="NoiseGateToggle"
-                                                      HorizontalAlignment="Right"
-                                                      IsChecked="False"
-                                                      ToolTip="Включить или выключить шумовую дверь"/>
-                                    </Grid>
-
-                                    <TextBlock Text="Порог"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="9" Margin="0,0,0,2"/>
-                                    <Slider x:Name="NoiseGateThreshold"
-                                            Style="{DynamicResource PurpleSlider}"
-                                            Minimum="-80" Maximum="0" Value="-40"
-                                            ToolTip="Уровень шума ниже которого звук будет полностью отсекаться"/>
-
-                                    <TextBlock Text="Атака"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="9" Margin="0,2,0,2"/>
-                                    <Slider x:Name="NoiseGateAttack"
-                                            Style="{DynamicResource PurpleSlider}"
-                                            Minimum="0" Maximum="100" Value="10"
-                                            ToolTip="Время срабатывания шумовой двери в миллисекундах"/>
-
-                                    <TextBlock Text="Отпускание"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                               FontSize="9" Margin="0,2,0,2"/>
-                                    <Slider x:Name="NoiseGateRelease"
-                                            Style="{DynamicResource PurpleSlider}"
-                                            Minimum="10" Maximum="500" Value="100"
-                                            ToolTip="Время отпускания шумовой двери в миллисекундах"/>
+                                    <TextBlock Text="ШУМОЗАТОР" Foreground="#FFB0B0D0" FontSize="9" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <CheckBox x:Name="NoiseGateToggle" Content="Включён"
+                                              Foreground="#FFB0B0D0" FontSize="9" IsChecked="False" Margin="0,0,0,4"
+                                              ToolTip="Включить шумозатвор"/>
+                                    <TextBlock Text="Порог" Foreground="#FF8080B0" FontSize="8" Margin="0,0,0,1"/>
+                                    <Slider x:Name="NoiseGateThreshold" Minimum="-60" Maximum="0" Value="-30"
+                                            Style="{StaticResource ModernSlider}"
+                                            ToolTip="Уровень порога шумозатвора"/>
+                                    <TextBlock Text="Атака" Foreground="#FF8080B0" FontSize="8" Margin="0,0,0,1"/>
+                                    <Slider x:Name="NoiseGateAttack" Minimum="0" Maximum="100" Value="10"
+                                            Style="{StaticResource ModernSlider}"
+                                            ToolTip="Время атаки шумозатвора (мс)"/>
+                                    <TextBlock Text="Освобождение" Foreground="#FF8080B0" FontSize="8" Margin="0,0,0,1"/>
+                                    <Slider x:Name="NoiseGateRelease" Minimum="10" Maximum="500" Value="100"
+                                            Style="{StaticResource ModernSlider}"
+                                            ToolTip="Время освобождения шумозатвора (мс)"/>
                                 </StackPanel>
                             </Border>
 
-                            <!-- Devices button -->
-                            <Button Content="🔄 Устройства"
-                                    Style="{DynamicResource ModernButton}"
-                                    Margin="0,4,0,12"
-                                    Padding="0,8"
-                                    ToolTip="Открыть настройки аудиоустройств"
-                                    Click="DevicesButton_Click"/>
+                            <!-- Devices Quick Access -->
+                            <Border Background="#FF16163A" CornerRadius="8" Padding="8" Margin="0,0,0,6">
+                                <Button Content="НАСТРОЙКА УСТРОЙСТВ" Style="{StaticResource AccentButton}"
+                                        Click="DevicesButton_Click" FontSize="9"
+                                        ToolTip="Быстро перейти к настройкам устройств"/>
+                            </Border>
+
                         </StackPanel>
                     </ScrollViewer>
                 </Border>
 
-                <!-- ─────── TABS AREA ─────── -->
-                <TabControl Grid.Column="1"
-                            x:Name="MainTabControl"
-                            Style="{DynamicResource ModernTabControl}"
-                            Margin="6,6,6,6"
-                            BorderThickness="0"
-                            Background="Transparent">
+                <!-- TAB AREA (Column 1) with Spectrum below -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="70"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- ═══════ TAB: УСТРОЙСТВА ═══════ -->
-                    <TabItem Style="{DynamicResource ModernTabItem}" Header="УСТРОЙСТВА">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      Padding="8">
-                            <StackPanel MaxWidth="550">
+                    <!-- TabControl (Row 0) -->
+                    <TabControl Grid.Row="0" Margin="4" Background="Transparent" BorderThickness="0"
+                                Padding="0" TabStripPlacement="Top">
 
-                                <!-- Input Device -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="УСТРОЙСТВО ВВОДА"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Margin="0,0,0,8"/>
-                                        <ComboBox x:Name="InputDeviceComboBox"
-                                                  Style="{DynamicResource ModernComboBox}"
-                                                  ToolTip="Выберите микрофон или устройство ввода"
-                                                  DisplayMemberPath="FriendlyName"
-                                                  SelectedValue="{Binding SelectedInputDevice}"
-                                                  ItemsSource="{Binding InputDevices}"/>
-                                    </StackPanel>
-                                </Border>
+                        <!-- TAB 1: УСТРОЙСТВА -->
+                        <TabItem Header="УСТРОЙСТВА" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8">
+                                <StackPanel Margin="4">
 
-                                <!-- Output Device -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="УСТРОЙСТВО ВЫВОДА"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Margin="0,0,0,8"/>
-                                        <ComboBox x:Name="OutputDeviceComboBox"
-                                                  Style="{DynamicResource ModernComboBox}"
-                                                  ToolTip="Выберите устройство вывода (колонки / наушники)"
-                                                  DisplayMemberPath="FriendlyName"
-                                                  SelectedValue="{Binding SelectedOutputDevice}"
-                                                  ItemsSource="{Binding OutputDevices}"/>
-                                    </StackPanel>
-                                </Border>
+                                    <TextBlock Text="АУДИО УСТРОЙСТВА" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
-                                <!-- Transport -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="УПРАВЛЕНИЕ"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Margin="0,0,0,10"/>
-                                        <WrapPanel HorizontalAlignment="Center">
-                                            <Button Content="▶ СЛУШАТЬ"
-                                                    Style="{DynamicResource AccentButton}"
-                                                    Width="120" Height="36" Margin="4"
-                                                    ToolTip="Начать прослушивание микрофона в реальном времени"
-                                                    Click="ListenBtn_Click"/>
-                                            <Button Content="⏹ СТОП"
-                                                    Style="{DynamicResource DangerButton}"
-                                                    Width="120" Height="36" Margin="4"
-                                                    ToolTip="Остановить прослушивание"
-                                                    Click="StopBtn_Click"/>
-                                            <Button Content="⏺ ЗАПИСЬ"
-                                                    Style="{DynamicResource PurpleButton}"
-                                                    Width="120" Height="36" Margin="4"
-                                                    ToolTip="Начать запись аудио с микрофона"
-                                                    Click="RecordBtn_Click"/>
-                                            <Button Content="⏹ СТОП ЗАП."
-                                                    Style="{DynamicResource DangerButton}"
-                                                    Width="120" Height="36" Margin="4"
-                                                    ToolTip="Остановить запись аудио"
-                                                    Click="StopRecordBtn_Click"/>
-                                        </WrapPanel>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Pink Noise -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <Grid>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="РОЗОВЫЙ ШУМ"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       FontSize="12" FontWeight="SemiBold"
-                                                       VerticalAlignment="Center"/>
-                                            <TextBlock Text="  —  Тестирование акустики"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       FontSize="11"
-                                                       VerticalAlignment="Center"/>
+                                    <!-- Input Device -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <TextBlock Text="Устройство ввода" Foreground="#FF8080B0" FontSize="10" Margin="0,0,0,4"/>
+                                            <ComboBox x:Name="InputDeviceComboBox" Style="{StaticResource ModernComboBox}"
+                                                      DisplayMemberPath="Name" Margin="0,0,0,4"
+                                                      ToolTip="Выберите микрофон или устройство ввода"/>
                                         </StackPanel>
-                                        <ToggleButton x:Name="PinkNoiseToggle"
-                                                      HorizontalAlignment="Right"
-                                                      IsChecked="False"
-                                                      ToolTip="Генерировать розовый шум для калибровки и тестирования"/>
+                                    </Border>
+
+                                    <!-- Output Device -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <TextBlock Text="Устройство вывода" Foreground="#FF8080B0" FontSize="10" Margin="0,0,0,4"/>
+                                            <ComboBox x:Name="OutputDeviceComboBox" Style="{StaticResource ModernComboBox}"
+                                                      DisplayMemberPath="Name" Margin="0,0,0,4"
+                                                      ToolTip="Выберите устройство воспроизведения"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <TextBlock Text="УПРАВЛЕНИЕ ЗАПИСЬЮ" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
+
+                                    <!-- Transport Controls -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" x:Name="ListenBtn" Content="Прослушать"
+                                                    Style="{StaticResource AccentButton}" FontSize="9" Margin="0,0,3,0"
+                                                    Click="ListenBtn_Click"
+                                                    ToolTip="Начать прослушивание микрофона"/>
+                                            <Button Grid.Column="1" x:Name="StopBtn" Content="Стоп"
+                                                    Style="{StaticResource ModernButton}" FontSize="9" Margin="1,0,1,0"
+                                                    Click="StopBtn_Click"
+                                                    ToolTip="Остановить прослушивание"/>
+                                            <Button Grid.Column="2" x:Name="RecordBtn" Content="Запись"
+                                                    Style="{StaticResource DangerButton}" FontSize="9" Margin="1,0,3,0"
+                                                    Click="RecordBtn_Click"
+                                                    ToolTip="Начать запись"/>
+                                            <Button Grid.Column="3" x:Name="StopRecordBtn" Content="Стоп запись"
+                                                    Style="{StaticResource ModernButton}" FontSize="9" Margin="3,0,0,0"
+                                                    Click="StopRecordBtn_Click"
+                                                    ToolTip="Остановить запись"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <TextBlock Text="ДОПОЛНИТЕЛЬНО" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
+
+                                    <!-- Pink Noise Toggle -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <CheckBox x:Name="PinkNoiseToggle" Content="Розовый шум"
+                                                  Foreground="#FFB0B0D0" FontSize="10" IsChecked="False"
+                                                  ToolTip="Воспроизводить розовый шум для настройки акустики"/>
+                                    </Border>
+
+                                    <TextBlock Text="СРАВНЕНИЕ A/B" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
+
+                                    <!-- A/B Comparison -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" x:Name="SaveSlotA" Content="Слот A"
+                                                    Style="{StaticResource PurpleButton}" FontSize="9" Margin="0,0,3,0"
+                                                    Click="SaveSlotA_Click"
+                                                    ToolTip="Сохранить текущие настройки в слот A"/>
+                                            <Button Grid.Column="1" x:Name="SaveSlotB" Content="Слот B"
+                                                    Style="{StaticResource PurpleButton}" FontSize="9" Margin="1,0,3,0"
+                                                    Click="SaveSlotB_Click"
+                                                    ToolTip="Сохранить текущие настройки в слот B"/>
+                                            <Button Grid.Column="2" x:Name="ToggleAB" Content="A/B"
+                                                    Style="{StaticResource AccentButton}" FontSize="9" Margin="3,0,0,0"
+                                                    Click="ToggleAB_Click"
+                                                    ToolTip="Переключаться между слотами A и B"/>
+                                        </Grid>
+                                    </Border>
+
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+
+                        <!-- TAB 2: ЭКВАЛАЙЗЕР -->
+                        <TabItem Header="ЭКВАЛАЙЗЕР" Style="{StaticResource ModernTabItem}">
+                            <Grid Margin="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- EQ Header -->
+                                <Border Grid.Row="0" Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                    <Grid>
+                                        <TextBlock Text="10-BAND EQ" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
+                                        <Button x:Name="ResetEQBtn" Content="СБРОС" HorizontalAlignment="Right"
+                                                Style="{StaticResource ModernButton}" FontSize="9"
+                                                Click="ResetEQ_Click"
+                                                ToolTip="Сбросить все полосы эквалайзера в ноль"/>
                                     </Grid>
                                 </Border>
 
-                                <!-- A/B Comparison -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="СРАВНЕНИЕ A / B"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Margin="0,0,0,10"/>
-                                        <WrapPanel HorizontalAlignment="Center">
-                                            <Button Content="💾 Сохранить A"
-                                                    Style="{DynamicResource ModernButton}"
-                                                    Width="130" Height="36" Margin="4"
-                                                    ToolTip="Сохранить текущие настройки в слот A"
-                                                    Click="SaveSlotA_Click"/>
-                                            <Button Content="💾 Сохранить B"
-                                                    Style="{DynamicResource ModernButton}"
-                                                    Width="130" Height="36" Margin="4"
-                                                    ToolTip="Сохранить текущие настройки в слот B"
-                                                    Click="SaveSlotB_Click"/>
-                                            <Button Content="🔀 Переключить"
-                                                    Style="{DynamicResource AccentButton}"
-                                                    Width="130" Height="36" Margin="4"
-                                                    ToolTip="Переключить между настройками A и B"
-                                                    Click="ToggleAB_Click"/>
-                                        </WrapPanel>
-                                    </StackPanel>
-                                </Border>
-
-                            </StackPanel>
-                        </ScrollViewer>
-                    </TabItem>
-
-                    <!-- ═══════ TAB: ЭКВАЛАЙЗЕР ═══════ -->
-                    <TabItem Style="{DynamicResource ModernTabItem}" Header="ЭКВАЛАЙЗЕР">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      Padding="8">
-                            <StackPanel MaxWidth="550">
-
-                                <Grid Margin="0,0,0,12">
-                                    <TextBlock Text="10-BAND PARAMETRIC EQ"
-                                               Foreground="{DynamicResource TextPrimaryBrush}"
-                                               FontSize="14" FontWeight="Bold"
-                                               VerticalAlignment="Center"/>
-                                    <Button Content="СБРОС"
-                                            Style="{DynamicResource DangerButton}"
-                                            HorizontalAlignment="Right"
-                                            Width="80" Height="30"
-                                            ToolTip="Сбросить все полосы эквалайзера в ноль"
-                                            Click="ResetEQ_Click"/>
-                                </Grid>
-
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="14">
+                                <!-- EQ Bands -->
+                                <Border Grid.Row="1" Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,0">
                                     <ItemsControl ItemsSource="{Binding EqualizerBands}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Margin="0,4">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Label Content="{Binding FrequencyLabel}"
-                                                           Foreground="{DynamicResource TextPrimaryBrush}"
-                                                           VerticalAlignment="Center" HorizontalAlignment="Left"
-                                                           Margin="0,0,8,0" FontSize="11"/>
-                                                    <Slider Grid.Column="1"
-                                                            Style="{DynamicResource PurpleSlider}"
-                                                            Minimum="-12" Maximum="12"
-                                                            Value="{Binding Gain, Mode=TwoWay}"
-                                                            ToolTip="{Binding FrequencyLabel, StringFormat='Регулировка полосы {0}'}"
-                                                            VerticalAlignment="Center"/>
-                                                    <TextBlock Grid.Column="2"
-                                                               Text="{Binding Gain, StringFormat='{}{0:F1} dB'}"
-                                                               Foreground="{DynamicResource TextSecondaryBrush}"
-                                                               VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                               FontSize="11"/>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
                                     </ItemsControl>
                                 </Border>
+                            </Grid>
+                        </TabItem>
 
-                            </StackPanel>
-                        </ScrollViewer>
-                    </TabItem>
+                        <!-- TAB 3: ЭФФЕКТЫ -->
+                        <TabItem Header="ЭФФЕКТЫ" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8">
+                                <StackPanel Margin="4">
 
-                    <!-- ═══════ TAB: ЭФФЕКТЫ ═══════ -->
-                    <TabItem Style="{DynamicResource ModernTabItem}" Header="ЭФФЕКТЫ">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      Padding="8">
-                            <StackPanel MaxWidth="550">
+                                    <TextBlock Text="КОМПРЕССОР" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
-                                <!-- Compressor -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="КОМПРЕССОР"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                                   FontSize="14" FontWeight="Bold"
-                                                   Margin="0,0,0,12"/>
+                                    <!-- Compressor -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="36"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Порог" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="CompressorThreshold" Minimum="-40" Maximum="0" Value="-20"
+                                                        Style="{StaticResource AccentSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Порог срабатывания компрессора (дБ)"/>
+                                                <TextBlock Grid.Column="2" Text="-20" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="36"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Коэффициент" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="CompressorRatio" Minimum="1" Maximum="20" Value="4"
+                                                        Style="{StaticResource AccentSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Коэффициент сжатия"/>
+                                                <TextBlock Grid.Column="2" Text="4:1" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="36"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Атака" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="CompressorAttack" Minimum="0" Maximum="100" Value="10"
+                                                        Style="{StaticResource AccentSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Время атаки компрессора (мс)"/>
+                                                <TextBlock Grid.Column="2" Text="10" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="36"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Освобождение" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="CompressorRelease" Minimum="10" Maximum="500" Value="100"
+                                                        Style="{StaticResource AccentSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Время освобождения компрессора (мс)"/>
+                                                <TextBlock Grid.Column="2" Text="100" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                                        <!-- Row 1: Threshold -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Порог"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="-60" Maximum="0" Value="-20"
-                                                    ToolTip="Уровень сигнала при котором компрессор начинает работать (дБ)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="-20 dB"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                    <TextBlock Text="ЛИМИТЕР" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
 
-                                        <!-- Row 2: Ratio -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Коэффициент"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="1" Maximum="20" Value="4"
-                                                    ToolTip="Степень сжатия сигнала (1:1 — без сжатия, 20:1 — жёсткое)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="4:1"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                    <!-- Limiter -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="36"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Порог" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="LimiterThreshold" Minimum="-20" Maximum="0" Value="-1"
+                                                        Style="{StaticResource PurpleSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Порог лимитера (дБ)"/>
+                                                <TextBlock Grid.Column="2" Text="-1" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="36"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Освобождение" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="LimiterRelease" Minimum="10" Maximum="500" Value="50"
+                                                        Style="{StaticResource PurpleSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Время освобождения лимитера (мс)"/>
+                                                <TextBlock Grid.Column="2" Text="50" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                                        <!-- Row 3: Attack -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Атака"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="200" Value="10"
-                                                    ToolTip="Время срабатывания компрессора в миллисекундах"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="10 мс"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                    <TextBlock Text="ПРЕСЕТЫ ЭФФЕКТОВ" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
 
-                                        <!-- Row 4: Release -->
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Отпускание"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="10" Maximum="1000" Value="200"
-                                                    ToolTip="Время отпускания компрессора в миллисекундах"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="200 мс"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                                    <!-- Effects Presets -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <ComboBox x:Name="EffectsPresetsComboBox" Style="{StaticResource ModernComboBox}"
+                                                      Margin="0,0,0,6" DisplayMemberPath="Name"
+                                                      ToolTip="Выберите пресет эффектов"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Grid.Column="0" Content="Загрузить" Style="{StaticResource AccentButton}"
+                                                        FontSize="9" Margin="0,0,3,0" Click="LoadEffectPreset_Click"
+                                                        ToolTip="Загрузить выбранный пресет"/>
+                                                <Button Grid.Column="1" Content="Сохранить" Style="{StaticResource ModernButton}"
+                                                        FontSize="9" Margin="1,0,3,0" Click="SaveEffectPreset_Click"
+                                                        ToolTip="Сохранить текущие эффекты как пресет"/>
+                                                <Button Grid.Column="2" Content="Удалить" Style="{StaticResource DangerButton}"
+                                                        FontSize="9" Margin="3,0,0,0" Click="DeleteEffectPreset_Click"
+                                                        ToolTip="Удалить выбранный пресет"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                                <!-- Limiter -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="ЛИМИТЕР"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                                   FontSize="14" FontWeight="Bold"
-                                                   Margin="0,0,0,12"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
 
-                                        <!-- Threshold -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Порог"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="-12" Maximum="0" Value="-1"
-                                                    ToolTip="Максимальный уровень сигнала (дБ) — сигнал не будет превышать этот порог"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="-1 dB"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                        <!-- TAB 4: ГОЛОС -->
+                        <TabItem Header="ГОЛОС" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8">
+                                <StackPanel Margin="4">
 
-                                        <!-- Release -->
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="100"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Отпускание"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="10" Maximum="1000" Value="200"
-                                                    ToolTip="Время восстановления лимитера после ограничения сигнала (мс)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="200 мс"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                                    <TextBlock Text="МОРФИНГ ГОЛОСА" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
-                                <!-- Presets -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="ПРЕСЕТЫ ЭФФЕКТОВ"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Margin="0,0,0,10"/>
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <ComboBox x:Name="EffectsPresetsComboBox"
-                                                      Style="{DynamicResource ModernComboBox}"
-                                                      ToolTip="Выберите пресет эффектов"
-                                                      DisplayMemberPath="Name"
-                                                      ItemsSource="{Binding EffectPresets}"/>
-                                            <Button Grid.Column="1"
-                                                    Content="📥"
-                                                    Width="40" Height="32" Margin="6,0,0,0"
-                                                    ToolTip="Загрузить выбранный пресет"
-                                                    Click="LoadEffectPreset_Click"/>
-                                        </Grid>
-                                        <WrapPanel HorizontalAlignment="Center">
-                                            <Button Content="💾"
-                                                    Width="40" Height="32" Margin="4"
-                                                    Style="{DynamicResource ModernButton}"
-                                                    ToolTip="Сохранить текущие настройки как пресет"
-                                                    Click="SaveEffectPreset_Click"/>
-                                            <Button Content="🗑️"
-                                                    Width="40" Height="32" Margin="4"
-                                                    Style="{DynamicResource DangerButton}"
-                                                    ToolTip="Удалить выбранный пресет"
-                                                    Click="DeleteEffectPreset_Click"/>
-                                        </WrapPanel>
-                                    </StackPanel>
-                                </Border>
+                                    <!-- Voice Morphing -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <CheckBox x:Name="VoiceMorphToggle" Content="Морфинг голоса включён"
+                                                      Foreground="#FFB0B0D0" FontSize="10" IsChecked="False" Margin="0,0,0,6"
+                                                      ToolTip="Включить изменение голоса"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="42"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Тон" Foreground="#FF8080B0" FontSize="10" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="PitchSlider" Minimum="-12" Maximum="12" Value="0"
+                                                        Style="{StaticResource PurpleSlider}" Margin="6,0,6,0"
+                                                        ToolTip="Изменение тона голоса (полутона)"/>
+                                                <TextBlock Grid.Column="2" x:Name="PitchDisplayText" Text="0 ст."
+                                                       Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center" TextAlignment="Right"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                            </StackPanel>
-                        </ScrollViewer>
-                    </TabItem>
+                                    <TextBlock Text="ПРЕСЕТЫ ГОЛОСА" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
 
-                    <!-- ═══════ TAB: ГОЛОС ═══════ -->
-                    <TabItem Style="{DynamicResource ModernTabItem}" Header="ГОЛОС">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      Padding="8">
-                            <StackPanel MaxWidth="550">
+                                    <!-- Voice Presets -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <ComboBox x:Name="VoicePresetsComboBox" Style="{StaticResource ModernComboBox}"
+                                                      DisplayMemberPath="Name" Margin="0,0,0,6"
+                                                      ToolTip="Выберите пресет голоса"/>
+                                            <Button x:Name="ApplyVoicePresetBtn" Content="Применить пресет"
+                                                    Style="{StaticResource AccentButton}" FontSize="10"
+                                                    Click="ApplyVoicePreset_Click"
+                                                    DataContext="{Binding SelectedVoicePreset, ElementName=VoicePresetsComboBox}"
+                                                    ToolTip="Применить выбранный пресет голоса"/>
+                                        </StackPanel>
+                                    </Border>
 
-                                <!-- Voice Morphing -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,8">
-                                            <TextBlock Text="ИЗМЕНЕНИЕ ГОЛОСА"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       FontSize="14" FontWeight="Bold"
-                                                       VerticalAlignment="Center"/>
-                                            <ToggleButton x:Name="VoiceMorphToggle"
-                                                          HorizontalAlignment="Right"
-                                                          IsChecked="False"
-                                                          ToolTip="Включить или выключить модуляцию голоса"/>
-                                        </Grid>
+                                    <TextBlock Text="АВТОМАТИЧЕСКАЯ ПОДДЕРЖКА ГРОМКОСТИ" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
 
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Высота тона"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    x:Name="PitchSlider"
-                                                    Style="{DynamicResource AccentSlider}"
-                                                    Minimum="0.5" Maximum="2.0" Value="1.0"
-                                                    ToolTip="Множитель высоты тона (0.5 = октава вниз, 2.0 = октава вверх)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       x:Name="PitchDisplayText"
-                                                       Text="1.0x"
-                                                       Foreground="{DynamicResource AccentBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="11" FontWeight="SemiBold"/>
-                                        </Grid>
+                                    <!-- AGC -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <CheckBox x:Name="AGCToggle" Content="АГК включён"
+                                                      Foreground="#FFB0B0D0" FontSize="10" IsChecked="False" Margin="0,0,0,6"
+                                                      ToolTip="Автоматическая поддержка громкости"/>
 
-                                        <TextBlock Text="Модуляция высоты тона голоса. Значение 1.0 — без изменений. Меньше 1.0 — голос ниже, больше 1.0 — голос выше."
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" TextWrapping="Wrap"
-                                                   Margin="0,0,0,4"/>
-                                    </StackPanel>
-                                </Border>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Цель" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="AGCTarget" Minimum="-20" Maximum="0" Value="-12"
+                                                        Style="{StaticResource ModernSlider}"
+                                                        ToolTip="Целевой уровень громкости (дБ)"/>
+                                            </Grid>
 
-                                <!-- Voice Presets -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="ПРЕСЕТЫ ГОЛОСА"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Margin="0,0,0,10"/>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <ComboBox x:Name="VoicePresetsComboBox"
-                                                      Style="{DynamicResource ModernComboBox}"
-                                                      ToolTip="Выберите пресет модуляции голоса"
-                                                      DisplayMemberPath="Name"
-                                                      SelectedValue="{Binding SelectedVoicePreset}"
-                                                      ItemsSource="{Binding VoicePresets}"/>
-                                            <Button Grid.Column="1"
-                                                    Content="Применить"
-                                                    Style="{DynamicResource AccentButton}"
-                                                    Width="100" Height="32" Margin="8,0,0,0"
-                                                    ToolTip="Применить выбранный пресет голоса"
-                                                    Click="ApplyVoicePreset_Click"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Атака" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="AGCAttack" Minimum="1" Maximum="100" Value="10"
+                                                        Style="{StaticResource ModernSlider}"
+                                                        ToolTip="Скорость автоматической регулировки (мс)"/>
+                                            </Grid>
 
-                                <!-- Auto Gain Control -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,12">
-                                            <TextBlock Text="АВТО УСИЛЕНИЕ (AGC)"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       FontSize="14" FontWeight="Bold"
-                                                       VerticalAlignment="Center"/>
-                                            <ToggleButton x:Name="AGCToggle"
-                                                          HorizontalAlignment="Right"
-                                                          IsChecked="False"
-                                                          ToolTip="Автоматическая регулировка уровня громкости"/>
-                                        </Grid>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Освобождение" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="AGCRelease" Minimum="10" Maximum="500" Value="100"
+                                                        Style="{StaticResource ModernSlider}"
+                                                        ToolTip="Время освобождения АГК (мс)"/>
+                                            </Grid>
 
-                                        <!-- Target Level -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Целевой уровень"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="-30" Maximum="0" Value="-12"
-                                                    ToolTip="Желаемый средний уровень громкости в дБ"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="-12 dB"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Макс. усил." Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="AGCMaxGain" Minimum="0" Maximum="30" Value="12"
+                                                        Style="{StaticResource ModernSlider}"
+                                                        ToolTip="Максимальное усиление АГК (дБ)"/>
+                                            </Grid>
 
-                                        <!-- Max Gain -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Макс. усиление"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="40" Value="20"
-                                                    ToolTip="Максимальное усиление которое может применить AGC (дБ)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="20 dB"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                                        <!-- Attack -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Атака"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="1" Maximum="500" Value="50"
-                                                    ToolTip="Скорость реакции AGC на повышение громкости (мс)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="50 мс"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
 
-                                        <!-- Release -->
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Отпускание"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="10" Maximum="2000" Value="500"
-                                                    ToolTip="Скорость возврата усиления после снижения громкости (мс)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="500 мс"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                        <!-- TAB 5: ПРОСТРАНСТВО -->
+                        <TabItem Header="ПРОСТРАНСТВО" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8">
+                                <StackPanel Margin="4">
 
-                            </StackPanel>
-                        </ScrollViewer>
-                    </TabItem>
+                                    <TextBlock Text="РЕВЕРБЕРАЦИЯ" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
-                    <!-- ═══════ TAB: ПРОСТРАНСТВО ═══════ -->
-                    <TabItem Style="{DynamicResource ModernTabItem}" Header="ПРОСТРАНСТВО">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      Padding="8">
-                            <StackPanel MaxWidth="550">
+                                    <!-- Reverb -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <CheckBox x:Name="ReverbToggle" Content="Реверберация включена"
+                                                      Foreground="#FFB0B0D0" FontSize="10" IsChecked="False" Margin="0,0,0,6"
+                                                      ToolTip="Включить эффект реверберации"/>
 
-                                <!-- Reverb -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,12">
-                                            <TextBlock Text="РЕВЕРБЕРАЦИЯ"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       FontSize="14" FontWeight="Bold"
-                                                       VerticalAlignment="Center"/>
-                                            <ToggleButton x:Name="ReverbToggle"
-                                                          HorizontalAlignment="Right"
-                                                          IsChecked="False"
-                                                          ToolTip="Включить или выключить реверберацию"/>
-                                        </Grid>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Смесь" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="ReverbMix" Minimum="0" Maximum="100" Value="30"
+                                                        Style="{StaticResource PurpleSlider}"
+                                                        ToolTip="Соотношение сухого и влажного сигнала (%)"/>
+                                            </Grid>
 
-                                        <!-- Wet Mix -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Влажность"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="100" Value="30"
-                                                    ToolTip="Соотношение обработанного (реверб) и сухого сигнала в процентах"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="30%"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Пространство" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="ReverbRoomSize" Minimum="0" Maximum="100" Value="50"
+                                                        Style="{StaticResource PurpleSlider}"
+                                                        ToolTip="Размер виртуального помещения (%)"/>
+                                            </Grid>
 
-                                        <!-- Room Size -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Размер комнаты"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="100" Value="50"
-                                                    ToolTip="Размер виртуального помещения — чем больше, тем длиннее хвост ревербации"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="50%"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Затухание" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="ReverbDamping" Minimum="0" Maximum="100" Value="40"
+                                                        Style="{StaticResource PurpleSlider}"
+                                                        ToolTip="Затухание высоких частот в реверберации (%)"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                                        <!-- Damping -->
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Затухание"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="100" Value="40"
-                                                    ToolTip="Скорость затухания высоких частот в ревербации — выше значение, тем мягче звук"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="40%"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                                    <TextBlock Text="ЭХО / ЗАДЕРЖКА" Foreground="#FFB0B0D0" FontSize="11" FontWeight="SemiBold" Margin="0,8,0,8"/>
 
-                                <!-- Echo / Delay -->
-                                <Border Style="{DynamicResource CardBorder}"
-                                        Padding="12" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,12">
-                                            <TextBlock Text="ЭХО / ДЕЛЕЙ"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"
-                                                       FontSize="14" FontWeight="Bold"
-                                                       VerticalAlignment="Center"/>
-                                            <ToggleButton x:Name="EchoToggle"
-                                                          HorizontalAlignment="Right"
-                                                          IsChecked="False"
-                                                          ToolTip="Включить или выключить эффект эха (делея)"/>
-                                        </Grid>
+                                    <!-- Echo / Delay -->
+                                    <Border Background="#FF16163A" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <StackPanel>
+                                            <CheckBox x:Name="EchoToggle" Content="Эхо включено"
+                                                      Foreground="#FFB0B0D0" FontSize="10" IsChecked="False" Margin="0,0,0,6"
+                                                      ToolTip="Включить эффект эха"/>
 
-                                        <!-- Delay Time -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="60"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Задержка"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="10" Maximum="2000" Value="300"
-                                                    ToolTip="Время задержки между повторами эха в миллисекундах"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="300 мс"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Задержка" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="EchoDelay" Minimum="10" Maximum="1000" Value="250"
+                                                        Style="{StaticResource PurpleSlider}"
+                                                        ToolTip="Время задержки эха (мс)"/>
+                                            </Grid>
 
-                                        <!-- Feedback -->
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Обратная связь"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="90" Value="40"
-                                                    ToolTip="Количество повторов эха (0 — один повтор, 90 — затяжное эхо)"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="40%"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Смесь" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="EchoMix" Minimum="0" Maximum="100" Value="25"
+                                                        Style="{StaticResource PurpleSlider}"
+                                                        ToolTip="Уровень эха относительно основного сигнала (%)"/>
+                                            </Grid>
 
-                                        <!-- Wet Mix -->
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="120"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Влажность"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" FontSize="11"/>
-                                            <Slider Grid.Column="1"
-                                                    Style="{DynamicResource PurpleSlider}"
-                                                    Minimum="0" Maximum="100" Value="30"
-                                                    ToolTip="Громкость эха относительно исходного сигнала в процентах"
-                                                    VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="30%"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       FontSize="10"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Затухание" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                                                <Slider Grid.Column="1" x:Name="EchoFeedback" Minimum="0" Maximum="90" Value="40"
+                                                        Style="{StaticResource PurpleSlider}"
+                                                        ToolTip="Количество повторов эха (%)"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
 
-                            </StackPanel>
-                        </ScrollViewer>
-                    </TabItem>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
 
-                </TabControl>
+                    </TabControl>
+
+                    <!-- Spectrum Visualizer (Row 1) - below tabs -->
+                    <Border Grid.Row="1" Background="#FF12122A" CornerRadius="6" Margin="4,0,4,4" Padding="2">
+                        <Canvas x:Name="SpectrumCanvas" ClipToBounds="True"/>
+                    </Border>
+
+                </Grid>
+
             </Grid>
 
-            <!-- ═══════════════════ SPECTRUM VISUALIZER ═══════════════════ -->
-            <Border Grid.Row="1"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Bottom"
-                    Margin="6,0,6,6"
-                    Height="70"
-                    Background="{DynamicResource BgMidBrush}"
-                    CornerRadius="8"
-                    Padding="4">
-                <Canvas x:Name="SpectrumCanvas"
-                        ClipToBounds="True"/>
-            </Border>
-
-            <!-- ═══════════════════ STATUS BAR ═══════════════════ -->
-            <Border Grid.Row="2"
-                    Background="{DynamicResource BgMidBrush}"
-                    CornerRadius="0,0,16,16"
-                    Padding="14,6">
-                <Grid>
+            <!-- ============================================ -->
+            <!-- STATUS BAR (Row 2)                           -->
+            <!-- ============================================ -->
+            <Border Grid.Row="2" Background="#FF0C0C24" BorderThickness="0,1,0,0" BorderBrush="#2A2A5A">
+                <Grid Margin="10,0,10,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
-                    <Ellipse x:Name="StatusIndicator"
-                             Width="10" Height="10"
-                             Fill="{DynamicResource SuccessBrush}"
-                             Margin="0,0,8,0"
-                             VerticalAlignment="Center">
-                        <Ellipse.Effect>
-                            <DropShadowEffect Color="{DynamicResource SuccessColor}"
-                                              ShadowDepth="0" BlurRadius="8" Opacity="0.5"/>
-                        </Ellipse.Effect>
-                    </Ellipse>
-
-                    <TextBlock x:Name="StatusMessage"
-                               Text="Готово"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               FontSize="11"
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusIndicator" Width="6" Height="6" Fill="#FF00E676" Margin="0,0,6,0"/>
+                        <TextBlock x:Name="StatusMessage" Text="Готово" Foreground="#FF8080B0" FontSize="9" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="MICSTUDIO PRO v4.0" Foreground="#FF505080" FontSize="8"
                                VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Column="2"
-                               Text="MICSTUDIO PRO v4.0"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               FontSize="10" FontWeight="SemiBold"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right"/>
                 </Grid>
             </Border>
 
