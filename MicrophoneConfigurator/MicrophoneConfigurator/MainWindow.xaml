@@ -207,6 +207,8 @@
                                             <TextBlock Text="Устройство ввода" Foreground="#FF8080B0" FontSize="10" Margin="0,0,0,4"/>
                                             <ComboBox x:Name="InputDeviceComboBox" Style="{StaticResource ModernComboBox}"
                                                       DisplayMemberPath="Name" Margin="0,0,0,4"
+                                                      ItemsSource="{Binding InputDevices}"
+                                                      SelectedValue="{Binding SelectedInputDevice}"
                                                       ToolTip="Выберите микрофон или устройство ввода"/>
                                         </StackPanel>
                                     </Border>
@@ -217,6 +219,8 @@
                                             <TextBlock Text="Устройство вывода" Foreground="#FF8080B0" FontSize="10" Margin="0,0,0,4"/>
                                             <ComboBox x:Name="OutputDeviceComboBox" Style="{StaticResource ModernComboBox}"
                                                       DisplayMemberPath="Name" Margin="0,0,0,4"
+                                                      ItemsSource="{Binding OutputDevices}"
+                                                      SelectedValue="{Binding SelectedOutputDevice}"
                                                       ToolTip="Выберите устройство воспроизведения"/>
                                         </StackPanel>
                                     </Border>
