@@ -1,0 +1,32 @@
+## .NET
+bin/
+obj/
+publish/
+*.exe
+*.pdb
+*.cache
+*.dll
+*.nupkg
+*.snupkg
+
+## IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+## Build
+project.lock.json
+project.fragment.lock.json
+
+## OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+## Temp
+error*.txt
+output*.txt
+*.tmp
