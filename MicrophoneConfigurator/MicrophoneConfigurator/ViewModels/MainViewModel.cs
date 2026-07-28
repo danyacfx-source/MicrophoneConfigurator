@@ -477,7 +477,8 @@ namespace MicrophoneConfigurator.ViewModels
         private void StartRecording()
         {
             var dialog = new SaveFileDialog { Filter = "WAV файлы|*.wav", DefaultExt = ".wav", Title = "Сохранить запись" };
-            if (dialog.ShowDialog() == true)
+            var owner = System.Windows.Application.Current.MainWindow;
+            if (dialog.ShowDialog(owner) == true)
             {
                 _engine.StartRecording(dialog.FileName);
                 IsRecording = true;
@@ -648,7 +649,8 @@ namespace MicrophoneConfigurator.ViewModels
         private void SavePreset()
         {
             var dialog = new SaveFileDialog { Filter = "JSON файлы|*.json", DefaultExt = ".json", Title = "Сохранить пресет" };
-            if (dialog.ShowDialog() == true)
+            var owner2 = System.Windows.Application.Current.MainWindow;
+            if (dialog.ShowDialog(owner2) == true)
             {
                 var name = Path.GetFileNameWithoutExtension(dialog.FileName);
                 var preset = CaptureCurrentState();

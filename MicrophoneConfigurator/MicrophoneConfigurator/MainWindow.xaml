@@ -208,7 +208,7 @@
                                             <ComboBox x:Name="InputDeviceComboBox" Style="{StaticResource ModernComboBox}"
                                                       DisplayMemberPath="Name" Margin="0,0,0,4"
                                                       ItemsSource="{Binding InputDevices}"
-                                                      SelectedValue="{Binding SelectedInputDevice}"
+                                                      SelectedItem="{Binding SelectedInputDevice}"
                                                       ToolTip="Выберите микрофон или устройство ввода"/>
                                         </StackPanel>
                                     </Border>
@@ -220,7 +220,7 @@
                                             <ComboBox x:Name="OutputDeviceComboBox" Style="{StaticResource ModernComboBox}"
                                                       DisplayMemberPath="Name" Margin="0,0,0,4"
                                                       ItemsSource="{Binding OutputDevices}"
-                                                      SelectedValue="{Binding SelectedOutputDevice}"
+                                                      SelectedItem="{Binding SelectedOutputDevice}"
                                                       ToolTip="Выберите устройство воспроизведения"/>
                                         </StackPanel>
                                     </Border>
