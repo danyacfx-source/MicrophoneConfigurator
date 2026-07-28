@@ -26,6 +26,8 @@ namespace MicrophoneConfigurator.Core
         private AutoGainSampleProvider? _autoGain;
         private RecordingSampleProvider? _recordingProvider;
         private WaveInProvider? _waveInProvider;
+        private PinkNoiseGenerator? _pinkNoiseGenerator;
+        private WaveOutEvent? _noiseOut;
 
         private readonly object _lock = new();
         private bool _disposed;
@@ -39,6 +41,7 @@ namespace MicrophoneConfigurator.Core
         public float Volume { get; set; } = 1.0f;
         public bool IsMonitoring { get; private set; }
         public bool IsRecording { get; private set; }
+        public bool IsNoiseGenerating { get; private set; }
 
         public float[] SpectrumData { get; private set; } = new float[64];
         public float[] WaveformData { get; private set; } = new float[256];
@@ -437,6 +440,41 @@ namespace MicrophoneConfigurator.Core
             SetAutoGainSettings(preset.AutoGainTargetLevel, preset.AutoGainMaxGain, preset.AutoGainAttackMs, preset.AutoGainReleaseMs, preset.AutoGainEnabled);
         }
 
+        public void StartPinkNoise()
+        {
+            lock (_lock)
+            {
+                if (IsNoiseGenerating) return;
+
+                try
+                {
+                    _pinkNoiseGenerator = new PinkNoiseGenerator { IsGenerating = true };
+                    _noiseOut = new WaveOutEvent { DeviceNumber = GetOutputDeviceIndex() };
+                    _noiseOut.Init(_pinkNoiseGenerator);
+                    _noiseOut.Play();
+                    IsNoiseGenerating = true;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error starting pink noise: {ex.Message}");
+                }
+            }
+        }
+
+        public void StopPinkNoise()
+        {
+            lock (_lock)
+            {
+                if (!IsNoiseGenerating) return;
+
+                _pinkNoiseGenerator = null;
+                _noiseOut?.Stop();
+                _noiseOut?.Dispose();
+                _noiseOut = null;
+                IsNoiseGenerating = false;
+            }
+        }
+
         private int GetInputDeviceIndex()
         {
             if (SelectedInputDevice == null) return 0;
@@ -462,6 +500,7 @@ namespace MicrophoneConfigurator.Core
 
             StopMonitoring();
             StopRecording();
+            StopPinkNoise();
 
             _deviceEnumerator?.Dispose();
 

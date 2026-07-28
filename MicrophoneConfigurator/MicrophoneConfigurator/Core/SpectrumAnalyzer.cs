@@ -1,6 +1,6 @@
 using System;
-using NAudio.Wave;
 using System.Numerics;
+using NAudio.Wave;
 
 namespace MicrophoneConfigurator.Core
 {
@@ -8,10 +8,11 @@ namespace MicrophoneConfigurator.Core
     {
         private readonly ISampleProvider _source;
         private readonly float[] _fftBuffer;
+        private readonly float[] _window;
         private readonly float[] _spectrumData;
         private readonly float[] _waveformData;
         private int _fftPos;
-        private const int FftSize = 128;
+        private const int FftSize = 512;
 
         public event Action<float[], float[]>? SpectrumCalculated;
 
@@ -19,9 +20,13 @@ namespace MicrophoneConfigurator.Core
         {
             _source = source;
             WaveFormat = source.WaveFormat;
-            _fftBuffer = new float[FftSize * 2];
+            _fftBuffer = new float[FftSize];
             _spectrumData = new float[64];
             _waveformData = new float[256];
+
+            _window = new float[FftSize];
+            for (int i = 0; i < FftSize; i++)
+                _window[i] = 0.5f * (1.0f - (float)Math.Cos(2.0 * Math.PI * i / (FftSize - 1)));
         }
 
         public WaveFormat WaveFormat { get; }
@@ -33,7 +38,6 @@ namespace MicrophoneConfigurator.Core
             for (int i = 0; i < read; i++)
             {
                 _fftBuffer[_fftPos] = buffer[offset + i];
-                _fftBuffer[_fftPos + FftSize] = 0;
                 _fftPos++;
 
                 if (_fftPos >= FftSize)
@@ -44,9 +48,7 @@ namespace MicrophoneConfigurator.Core
 
                 int waveformIndex = (int)((float)i / read * _waveformData.Length);
                 if (waveformIndex < _waveformData.Length)
-                {
                     _waveformData[waveformIndex] = buffer[offset + i];
-                }
             }
 
             return read;
@@ -56,23 +58,24 @@ namespace MicrophoneConfigurator.Core
         {
             var fftComplex = new Complex[FftSize];
             for (int i = 0; i < FftSize; i++)
-            {
-                fftComplex[i] = new Complex(_fftBuffer[i], 0);
-            }
+                fftComplex[i] = new Complex(_fftBuffer[i] * _window[i], 0);
 
             FFT(fftComplex);
 
+            int usableBins = FftSize / 2;
             for (int i = 0; i < _spectrumData.Length; i++)
             {
-                int index = i * FftSize / _spectrumData.Length / 2;
-                if (index < fftComplex.Length)
-                {
-                    float magnitude = (float)Math.Sqrt(
-                        fftComplex[index].Real * fftComplex[index].Real +
-                        fftComplex[index].Imaginary * fftComplex[index].Imaginary
-                    );
-                    _spectrumData[i] = magnitude;
-                }
+                float freqRatio = (float)i / _spectrumData.Length;
+                int index = (int)(freqRatio * freqRatio * usableBins * 0.8f);
+                index = Math.Min(index, usableBins - 1);
+
+                float magnitude = (float)Math.Sqrt(
+                    fftComplex[index].Real * fftComplex[index].Real +
+                    fftComplex[index].Imaginary * fftComplex[index].Imaginary
+                );
+
+                float normalized = magnitude / (FftSize * 0.5f);
+                _spectrumData[i] = Math.Min(normalized * 2.0f, 1.0f);
             }
 
             SpectrumCalculated?.Invoke(_spectrumData, _waveformData);
