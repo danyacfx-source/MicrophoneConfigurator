@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MicrophoneConfigurator"
         xmlns:vm="clr-namespace:MicrophoneConfigurator.Core"
-        Title="MicStudio Pro" Height="750" Width="1050"
+        Title="MicStudio Pro" Height="800" Width="1150"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
@@ -13,7 +13,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <DataTemplate DataType="{x:Type vm:EqualizerBandModel}">
-            <Grid Margin="0,8">
+            <Grid Margin="0,6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60"/>
                     <ColumnDefinition Width="*"/>
@@ -63,7 +63,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
-                    <Button x:Name="MinimizeBtn" Content="─" Width="36" Height="28"
+                    <Button x:Name="MinimizeBtn" Content="&#x2500;" Width="36" Height="28"
                             Click="MinimizeBtn_Click"
                             Background="Transparent" Foreground="#8888AA" BorderThickness="0"
                             FontSize="12" Cursor="Hand"/>
@@ -77,184 +77,184 @@
             <!-- Main Content -->
             <Grid Grid.Row="1" Margin="12,8,12,4">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="230"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Left Sidebar -->
                 <Border Grid.Column="0" Background="{StaticResource BgMidBrush}" CornerRadius="12">
-                    <DockPanel LastChildFill="True" Margin="4">
-                        <StackPanel DockPanel.Dock="Top" Margin="12,16,12,0">
-                            <!-- VU Meter -->
-                            <TextBlock Text="УРОВЕНЬ" Foreground="{StaticResource TextSecondaryBrush}"
-                                       FontSize="10" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <DockPanel LastChildFill="True" Margin="4">
+                            <StackPanel DockPanel.Dock="Top" Margin="12,16,12,0">
+                                <!-- VU Meter -->
+                                <TextBlock Text="УРОВЕНЬ" Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="10" FontWeight="Bold" Margin="0,0,0,10"/>
 
-                            <Border Background="{StaticResource BgDarkBrush}" CornerRadius="8" Height="140" Padding="10">
+                                <Border Background="{StaticResource BgDarkBrush}" CornerRadius="8" Height="150" Padding="10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Left Channel -->
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Bottom">
+                                            <Border Background="{StaticResource BgLightBrush}" CornerRadius="4"
+                                                    Height="130" ClipToBounds="True" VerticalAlignment="Bottom">
+                                                <Grid>
+                                                    <Border x:Name="VuLeftBar" VerticalAlignment="Bottom" Height="0"
+                                                            CornerRadius="4">
+                                                        <Border.Background>
+                                                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                                                <GradientStop Color="#00B894" Offset="0"/>
+                                                                <GradientStop Color="#FDCB6E" Offset="0.6"/>
+                                                                <GradientStop Color="#FF6B6B" Offset="1"/>
+                                                            </LinearGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                    <Border x:Name="VuLeftPeak" VerticalAlignment="Bottom" Height="0"
+                                                            HorizontalAlignment="Stretch" CornerRadius="1">
+                                                        <Border.Background>
+                                                            <SolidColorBrush Color="#FFFFFF" Opacity="0.8"/>
+                                                        </Border.Background>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                            <TextBlock Text="L" Foreground="{StaticResource TextSecondaryBrush}"
+                                                       FontSize="9" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                        </StackPanel>
+
+                                        <!-- Peak Label -->
+                                        <TextBlock x:Name="VuPeakLabel" Grid.Column="1" Text="dB"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="8"
+                                                   VerticalAlignment="Top" Margin="2,0,0,0"/>
+
+                                        <!-- Right Channel -->
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+                                            <Border Background="{StaticResource BgLightBrush}" CornerRadius="4"
+                                                    Height="130" ClipToBounds="True" VerticalAlignment="Bottom">
+                                                <Grid>
+                                                    <Border x:Name="VuRightBar" VerticalAlignment="Bottom" Height="0"
+                                                            CornerRadius="4">
+                                                        <Border.Background>
+                                                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                                                <GradientStop Color="#00B894" Offset="0"/>
+                                                                <GradientStop Color="#FDCB6E" Offset="0.6"/>
+                                                                <GradientStop Color="#FF6B6B" Offset="1"/>
+                                                            </LinearGradientBrush>
+                                                        </Border.Background>
+                                                    </Border>
+                                                    <Border x:Name="VuRightPeak" VerticalAlignment="Bottom" Height="0"
+                                                            HorizontalAlignment="Stretch" CornerRadius="1">
+                                                        <Border.Background>
+                                                            <SolidColorBrush Color="#FFFFFF" Opacity="0.8"/>
+                                                        </Border.Background>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                            <TextBlock Text="R" Foreground="{StaticResource TextSecondaryBrush}"
+                                                       FontSize="9" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Master Volume -->
+                                <TextBlock Text="МАСТЕР" Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="10" FontWeight="Bold" Margin="0,16,0,8"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="8"/>
-                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
-
-                                    <!-- Left Channel -->
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Bottom">
-                                        <Border Background="{StaticResource BgLightBrush}" CornerRadius="4"
-                                                Height="120" ClipToBounds="True" VerticalAlignment="Bottom">
-                                            <Border x:Name="VuLeftBar" VerticalAlignment="Bottom" Height="0"
-                                                    CornerRadius="4">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                                        <GradientStop Color="#00B894" Offset="0"/>
-                                                        <GradientStop Color="#FDCB6E" Offset="0.6"/>
-                                                        <GradientStop Color="#FF6B6B" Offset="1"/>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                            </Border>
-                                        </Border>
-                                        <TextBlock Text="L" Foreground="{StaticResource TextSecondaryBrush}"
-                                                   FontSize="9" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                                    </StackPanel>
-
-                                    <!-- Peak Label -->
-                                    <TextBlock x:Name="VuPeakLabel" Grid.Column="1" Text="dB"
-                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="8"
-                                               VerticalAlignment="Top" Margin="2,0,0,0"/>
-
-                                    <!-- Right Channel -->
-                                    <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
-                                        <Border Background="{StaticResource BgLightBrush}" CornerRadius="4"
-                                                Height="120" ClipToBounds="True" VerticalAlignment="Bottom">
-                                            <Border x:Name="VuRightBar" VerticalAlignment="Bottom" Height="0"
-                                                    CornerRadius="4">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                                        <GradientStop Color="#00B894" Offset="0"/>
-                                                        <GradientStop Color="#FDCB6E" Offset="0.6"/>
-                                                        <GradientStop Color="#FF6B6B" Offset="1"/>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                            </Border>
-                                        </Border>
-                                        <TextBlock Text="R" Foreground="{StaticResource TextSecondaryBrush}"
-                                                   FontSize="9" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                                    </StackPanel>
+                                    <Slider Grid.Column="0" Style="{StaticResource ModernSlider}"
+                                            Minimum="0" Maximum="2" Value="{Binding Volume}"
+                                            TickFrequency="0.05" IsSnapToTickEnabled="False"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Volume, Converter={x:Static local:VolumeConverter.Instance}}"
+                                               Foreground="{StaticResource AccentBrush}" FontWeight="Bold" FontSize="13"
+                                               VerticalAlignment="Center" TextAlignment="Right"/>
                                 </Grid>
-                            </Border>
 
-                            <!-- Master Volume -->
-                            <TextBlock Text="МАСТЕР" Foreground="{StaticResource TextSecondaryBrush}"
-                                       FontSize="10" FontWeight="Bold" Margin="0,16,0,8"/>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="40"/>
-                                </Grid.ColumnDefinitions>
-                                <Slider x:Name="MasterSlider" Grid.Column="0" Style="{StaticResource ModernSlider}"
-                                        Minimum="0" Maximum="2" Value="{Binding Volume}"
-                                        TickFrequency="0.05" IsSnapToTickEnabled="False"/>
-                                <TextBlock Grid.Column="1"
-                                           Text="{Binding Volume, Converter={x:Static local:VolumeConverter.Instance}}"
-                                           Foreground="{StaticResource AccentBrush}" FontWeight="Bold" FontSize="13"
-                                           VerticalAlignment="Center" TextAlignment="Right"/>
-                            </Grid>
-
-                            <!-- Gain Reduction Meter -->
-                            <TextBlock Text="СНИЖЕНИЕ УРОВНЯ" Foreground="{StaticResource TextSecondaryBrush}"
-                                       FontSize="10" FontWeight="Bold" Margin="0,16,0,8"/>
-                            <Border Background="{StaticResource BgDarkBrush}" CornerRadius="8" Padding="10" Height="40">
-                                <Grid>
-                                    <Border Background="{StaticResource BgLightBrush}" CornerRadius="4" Height="8"
-                                            VerticalAlignment="Center"/>
-                                    <Border x:Name="GainReductionBar" HorizontalAlignment="Left" Height="8"
-                                            CornerRadius="4" Width="0" VerticalAlignment="Center">
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                <GradientStop Color="#FDCB6E" Offset="0"/>
-                                                <GradientStop Color="#FF6B6B" Offset="1"/>
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                    </Border>
-                                    <TextBlock x:Name="GainReductionLabel" Text="0 dB"
-                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"
-                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Border>
-
-                            <!-- Noise Suppression -->
-                            <TextBlock Text="ШУМОПОДАВЛЕНИЕ" Foreground="{StaticResource TextSecondaryBrush}"
-                                       FontSize="10" FontWeight="Bold" Margin="0,16,0,8"/>
-                            <Border Background="{StaticResource BgDarkBrush}" CornerRadius="10" Padding="12,10">
-                                <StackPanel>
+                                <!-- Gain Reduction Meter -->
+                                <TextBlock Text="УРОВЕНЬ СЖАТИЯ" Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="10" FontWeight="Bold" Margin="0,14,0,8"/>
+                                <Border Background="{StaticResource BgDarkBrush}" CornerRadius="8" Padding="10" Height="36">
                                     <Grid>
-                                        <TextBlock Text="Включено" Foreground="{StaticResource TextPrimaryBrush}"
-                                                   FontSize="12" VerticalAlignment="Center"/>
-                                        <ToggleButton x:Name="NoiseGateToggle" HorizontalAlignment="Right"
-                                                      IsChecked="{Binding NoiseGateEnabled}"
-                                                      Width="44" Height="24" Cursor="Hand">
-                                            <ToggleButton.Template>
-                                                <ControlTemplate TargetType="ToggleButton">
-                                                    <Border x:Name="track" CornerRadius="12" Background="#2A2A5A"
-                                                            Width="44" Height="24">
-                                                        <Ellipse x:Name="thumb" Width="18" Height="18"
-                                                                 Fill="{StaticResource TextSecondaryBrush}"
-                                                                 HorizontalAlignment="Left" Margin="3,0,0,0">
-                                                            <Ellipse.Effect>
-                                                                <DropShadowEffect BlurRadius="4" ShadowDepth="0" Color="#000000" Opacity="0.3"/>
-                                                            </Ellipse.Effect>
-                                                        </Ellipse>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsChecked" Value="True">
-                                                            <Setter TargetName="track" Property="Background"
-                                                                    Value="{StaticResource AccentBrush}"/>
-                                                            <Setter TargetName="thumb" Property="Fill" Value="White"/>
-                                                            <Setter TargetName="thumb" Property="HorizontalAlignment"
-                                                                    Value="Right"/>
-                                                            <Setter TargetName="thumb" Property="Margin" Value="0,0,3,0"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </ToggleButton.Template>
-                                        </ToggleButton>
+                                        <Border Background="{StaticResource BgLightBrush}" CornerRadius="4" Height="6"
+                                                VerticalAlignment="Center"/>
+                                        <Border x:Name="GainReductionBar" HorizontalAlignment="Left" Height="6"
+                                                CornerRadius="4" Width="0" VerticalAlignment="Center">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#FDCB6E" Offset="0"/>
+                                                    <GradientStop Color="#FF6B6B" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock x:Name="GainReductionLabel" Text="0 dB"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </Grid>
+                                </Border>
 
-                                    <TextBlock Text="Порог" Foreground="{StaticResource TextSecondaryBrush}"
-                                               FontSize="10" Margin="0,8,0,4"/>
-                                    <Slider x:Name="NoiseGateThresholdSlider" Style="{StaticResource PurpleSlider}"
-                                            Minimum="-60" Maximum="0" Value="{Binding NoiseGateThresholdDb}"
-                                            TickFrequency="1"/>
-                                    <TextBlock Text="{Binding NoiseGateThresholdDb, StringFormat='{}{0:F0} dB'}"
-                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="10"
-                                               HorizontalAlignment="Right"/>
+                                <!-- Noise Suppression -->
+                                <TextBlock Text="ШУМОПОДАВЛЕНИЕ" Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="10" FontWeight="Bold" Margin="0,14,0,8"/>
+                                <Border Background="{StaticResource BgDarkBrush}" CornerRadius="10" Padding="12,10">
+                                    <StackPanel>
+                                        <Grid>
+                                            <TextBlock Text="Включено" Foreground="{StaticResource TextPrimaryBrush}"
+                                                       FontSize="12" VerticalAlignment="Center"/>
+                                            <ToggleButton IsChecked="{Binding NoiseGateEnabled}"
+                                                          HorizontalAlignment="Right"
+                                                          Width="44" Height="24" Cursor="Hand">
+                                                <ToggleButton.Template>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Border x:Name="track" CornerRadius="12" Background="#2A2A5A"
+                                                                Width="44" Height="24">
+                                                            <Ellipse x:Name="thumb" Width="18" Height="18"
+                                                                     Fill="{StaticResource TextSecondaryBrush}"
+                                                                     HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter TargetName="track" Property="Background"
+                                                                        Value="{StaticResource AccentBrush}"/>
+                                                                <Setter TargetName="thumb" Property="Fill" Value="White"/>
+                                                                <Setter TargetName="thumb" Property="HorizontalAlignment" Value="Right"/>
+                                                                <Setter TargetName="thumb" Property="Margin" Value="0,0,3,0"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </ToggleButton.Template>
+                                            </ToggleButton>
+                                        </Grid>
+                                        <TextBlock Text="Порог" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" Margin="0,8,0,4"/>
+                                        <Slider Style="{StaticResource PurpleSlider}" Minimum="-60" Maximum="0"
+                                                Value="{Binding NoiseGateThresholdDb}" TickFrequency="1"/>
+                                        <TextBlock Text="{Binding NoiseGateThresholdDb, StringFormat='{}{0:F0} dB'}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="Атака" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" Margin="0,6,0,4"/>
+                                        <Slider Style="{StaticResource PurpleSlider}" Minimum="0.1" Maximum="50"
+                                                Value="{Binding NoiseGateAttackMs}" TickFrequency="0.5"/>
+                                        <TextBlock Text="{Binding NoiseGateAttackMs, StringFormat='{}{0:F1} мс'}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="Затухание" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" Margin="0,6,0,4"/>
+                                        <Slider Style="{StaticResource PurpleSlider}" Minimum="10" Maximum="500"
+                                                Value="{Binding NoiseGateReleaseMs}" TickFrequency="5"/>
+                                        <TextBlock Text="{Binding NoiseGateReleaseMs, StringFormat='{}{0:F0} мс'}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
 
-                                    <TextBlock Text="Атака" Foreground="{StaticResource TextSecondaryBrush}"
-                                               FontSize="10" Margin="0,6,0,4"/>
-                                    <Slider x:Name="NoiseGateAttackSlider" Style="{StaticResource PurpleSlider}"
-                                            Minimum="0.1" Maximum="50" Value="{Binding NoiseGateAttackMs}"
-                                            TickFrequency="0.5"/>
-                                    <TextBlock Text="{Binding NoiseGateAttackMs, StringFormat='{}{0:F1} мс'}"
-                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="10"
-                                               HorizontalAlignment="Right"/>
-
-                                    <TextBlock Text="Затухание" Foreground="{StaticResource TextSecondaryBrush}"
-                                               FontSize="10" Margin="0,6,0,4"/>
-                                    <Slider x:Name="NoiseGateReleaseSlider" Style="{StaticResource PurpleSlider}"
-                                            Minimum="10" Maximum="500" Value="{Binding NoiseGateReleaseMs}"
-                                            TickFrequency="5"/>
-                                    <TextBlock Text="{Binding NoiseGateReleaseMs, StringFormat='{}{0:F0} мс'}"
-                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="10"
-                                               HorizontalAlignment="Right"/>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- Bottom buttons -->
-                        <StackPanel DockPanel.Dock="Bottom" Margin="12,0,12,12">
-                            <Button Content="&#x1F504; Устройства" Command="{Binding RefreshDevicesCommand}"
-                                    Style="{StaticResource ModernButton}" Margin="0,0,0,6" Padding="12,8" FontSize="11"/>
-                        </StackPanel>
-                    </DockPanel>
+                            <StackPanel DockPanel.Dock="Bottom" Margin="12,0,12,12">
+                                <Button Content="&#x1F504; Устройства" Command="{Binding RefreshDevicesCommand}"
+                                        Style="{StaticResource ModernButton}" Margin="0,0,0,6" Padding="12,8" FontSize="11"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </ScrollViewer>
                 </Border>
 
                 <!-- Right Content -->
@@ -266,73 +266,50 @@
 
                     <!-- Tabs -->
                     <TabControl Grid.Row="0" Style="{StaticResource ModernTabControl}">
-                        <TabItem Header="&#x1F39E;&#xFE0F; УСТРОЙСТВА" Style="{StaticResource ModernTabItem}">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}"
-                                          Padding="16">
+                        <!-- УСТРОЙСТВА -->
+                        <TabItem Header="УСТРОЙСТВА" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}" Padding="16">
                                 <StackPanel>
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
-                                            <TextBlock Text="&#x1F3A4; Вход (Микрофон)" Foreground="{StaticResource AccentBrush}"
-                                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
-                                             <ComboBox x:Name="InputDeviceCombo"
-                                                       ItemsSource="{Binding InputDevices}"
-                                                       SelectedItem="{Binding SelectedInputDevice}"
-                                                       DisplayMemberPath="Name"
-                                                       ItemContainerStyle="{StaticResource ModernComboBoxItem}"
-                                                       Style="{StaticResource ModernComboBox}"
-                                                       FontSize="13"/>
+                                            <TextBlock Text="Вход (Микрофон)" Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+                                            <ComboBox ItemsSource="{Binding InputDevices}" SelectedItem="{Binding SelectedInputDevice}"
+                                                      DisplayMemberPath="Name" ItemContainerStyle="{StaticResource ModernComboBoxItem}"
+                                                      Style="{StaticResource ModernComboBox}" FontSize="13"/>
                                         </StackPanel>
                                     </Border>
-
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
-                                            <TextBlock Text="&#x1F50A; Выход (Динамики)" Foreground="{StaticResource PrimaryBrush}"
-                                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
-                                             <ComboBox x:Name="OutputDeviceCombo"
-                                                       ItemsSource="{Binding OutputDevices}"
-                                                       SelectedItem="{Binding SelectedOutputDevice}"
-                                                       DisplayMemberPath="Name"
-                                                       ItemContainerStyle="{StaticResource ModernComboBoxItem}"
-                                                       Style="{StaticResource ModernComboBox}"
-                                                       FontSize="13"/>
+                                            <TextBlock Text="Выход (Динамики)" Foreground="{StaticResource PrimaryBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,10"/>
+                                            <ComboBox ItemsSource="{Binding OutputDevices}" SelectedItem="{Binding SelectedOutputDevice}"
+                                                      DisplayMemberPath="Name" ItemContainerStyle="{StaticResource ModernComboBoxItem}"
+                                                      Style="{StaticResource ModernComboBox}" FontSize="13"/>
                                         </StackPanel>
                                     </Border>
-
-                                    <!-- Transport Controls -->
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
-                                            <TextBlock Text="&#x2699;&#xFE0F; УПРАВЛЕНИЕ" Foreground="{StaticResource WarningBrush}"
-                                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
+                                            <TextBlock Text="УПРАВЛЕНИЕ" Foreground="{StaticResource WarningBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
                                             <WrapPanel HorizontalAlignment="Left">
-                                                <Button Content="&#x25B6;  СЛУШАТЬ"
-                                                        Command="{Binding StartMonitoringCommand}"
-                                                        Style="{StaticResource AccentButton}"
-                                                        Width="130" Margin="0,0,8,8"/>
-                                                <Button Content="&#x23F9;  СТОП"
-                                                        Command="{Binding StopMonitoringCommand}"
-                                                        Style="{StaticResource ModernButton}"
-                                                        Width="130" Margin="0,0,8,8"/>
-                                                <Button Content="&#x23FA;  ЗАПИСЬ"
-                                                        Command="{Binding StartRecordingCommand}"
-                                                        Style="{StaticResource DangerButton}"
-                                                        Width="130" Margin="0,0,8,8"/>
-                                                <Button Content="&#x23F9;  СТОП ЗАП."
-                                                        Command="{Binding StopRecordingCommand}"
-                                                        Style="{StaticResource ModernButton}"
-                                                        Width="130" Margin="0,0,8,8"/>
+                                                <Button Content="&#x25B6; СЛУШАТЬ" Command="{Binding StartMonitoringCommand}"
+                                                        Style="{StaticResource AccentButton}" Width="130" Margin="0,0,8,8"/>
+                                                <Button Content="&#x23F9; СТОП" Command="{Binding StopMonitoringCommand}"
+                                                        Style="{StaticResource ModernButton}" Width="130" Margin="0,0,8,8"/>
+                                                <Button Content="&#x23FA; ЗАПИСЬ" Command="{Binding StartRecordingCommand}"
+                                                        Style="{StaticResource DangerButton}" Width="130" Margin="0,0,8,8"/>
+                                                <Button Content="&#x23F9; СТОП ЗАП." Command="{Binding StopRecordingCommand}"
+                                                        Style="{StaticResource ModernButton}" Width="130" Margin="0,0,8,8"/>
                                             </WrapPanel>
-                                            <TextBlock Text="Горячие клавиши: Space = старт/стоп, Ctrl+R = запись"
-                                                       Foreground="{StaticResource TextSecondaryBrush}" FontSize="9"
-                                                       Margin="0,8,0,0"/>
+                                            <TextBlock Text="Space = старт/стоп | Ctrl+R = запись"
+                                                       Foreground="{StaticResource TextSecondaryBrush}" FontSize="9" Margin="0,8,0,0"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
 
-                        <TabItem Header="&#x1F39E;&#xFE0F; ЭКВАЛАЙЗЕР" Style="{StaticResource ModernTabItem}">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}"
-                                          Padding="16">
+                        <!-- ЭКВАЛАЙЗЕР -->
+                        <TabItem Header="ЭКВАЛАЙЗЕР" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}" Padding="16">
                                 <StackPanel>
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
@@ -346,7 +323,7 @@
                                             <ItemsControl ItemsSource="{Binding EqualizerBands}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Grid Margin="0,8">
+                                                        <Grid Margin="0,6">
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="60"/>
                                                                 <ColumnDefinition Width="*"/>
@@ -371,15 +348,14 @@
                             </ScrollViewer>
                         </TabItem>
 
-                        <TabItem Header="&#x26A1; ЭФФЕКТЫ" Style="{StaticResource ModernTabItem}">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}"
-                                          Padding="16">
+                        <!-- ЭФФЕКТЫ -->
+                        <TabItem Header="ЭФФЕКТЫ" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}" Padding="16">
                                 <StackPanel>
                                     <!-- Compressor -->
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
-                                            <TextBlock Text="&#x1F4CA; КОМПРЕССОР" Foreground="{StaticResource WarningBrush}"
-                                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
+                                            <TextBlock Text="КОМПРЕССОР" Foreground="{StaticResource WarningBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="100"/>
@@ -392,30 +368,18 @@
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
-
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Порог" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding CompressorThreshold}"
-                                                        Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CompressorThreshold, StringFormat='{}{0:F2}'}"
-                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
-
+                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding CompressorThreshold}" Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CompressorThreshold, StringFormat='{}{0:F2}'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Соотношение" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding CompressorRatio}"
-                                                        Style="{StaticResource ModernSlider}" TickFrequency="0.5"/>
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CompressorRatio, StringFormat='{}{0:F1}:1'}"
-                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
-
+                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding CompressorRatio}" Style="{StaticResource ModernSlider}" TickFrequency="0.5"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CompressorRatio, StringFormat='{}{0:F1}:1'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Атака" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                                                <Slider Grid.Row="2" Grid.Column="1" Minimum="0.1" Maximum="100" Value="{Binding CompressorAttackMs}"
-                                                        Style="{StaticResource ModernSlider}" TickFrequency="0.5"/>
-                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CompressorAttackMs, StringFormat='{}{0:F1} мс'}"
-                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
-
+                                                <Slider Grid.Row="2" Grid.Column="1" Minimum="0.1" Maximum="100" Value="{Binding CompressorAttackMs}" Style="{StaticResource ModernSlider}" TickFrequency="0.5"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CompressorAttackMs, StringFormat='{}{0:F1} мс'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Затухание" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                                                <Slider Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="1000" Value="{Binding CompressorReleaseMs}"
-                                                        Style="{StaticResource ModernSlider}" TickFrequency="5"/>
-                                                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CompressorReleaseMs, StringFormat='{}{0:F0} мс'}"
-                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <Slider Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="1000" Value="{Binding CompressorReleaseMs}" Style="{StaticResource ModernSlider}" TickFrequency="5"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CompressorReleaseMs, StringFormat='{}{0:F0} мс'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
@@ -423,8 +387,7 @@
                                     <!-- Limiter -->
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
-                                            <TextBlock Text="&#x1F6E1;&#xFE0F; ЛИМИТЕР" Foreground="{StaticResource DangerBrush}"
-                                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
+                                            <TextBlock Text="ЛИМИТЕР" Foreground="{StaticResource DangerBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="100"/>
@@ -435,18 +398,12 @@
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
-
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Порог" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding LimiterThreshold}"
-                                                        Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding LimiterThreshold, StringFormat='{}{0:F2}'}"
-                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
-
+                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding LimiterThreshold}" Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding LimiterThreshold, StringFormat='{}{0:F2}'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Затухание" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
-                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="500" Value="{Binding LimiterReleaseMs}"
-                                                        Style="{StaticResource ModernSlider}" TickFrequency="5"/>
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding LimiterReleaseMs, StringFormat='{}{0:F0} мс'}"
-                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="500" Value="{Binding LimiterReleaseMs}" Style="{StaticResource ModernSlider}" TickFrequency="5"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding LimiterReleaseMs, StringFormat='{}{0:F0} мс'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
@@ -454,8 +411,7 @@
                                     <!-- Presets -->
                                     <Border Style="{StaticResource CardBorder}">
                                         <StackPanel>
-                                            <TextBlock Text="&#x1F4BE; ПРЕСЕТЫ" Foreground="{StaticResource SuccessBrush}"
-                                                       FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
+                                            <TextBlock Text="ПРЕСЕТЫ" Foreground="{StaticResource SuccessBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,12"/>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
@@ -463,17 +419,225 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <ComboBox Grid.Column="0"
-                                                          ItemsSource="{Binding PresetNames}"
-                                                          SelectedItem="{Binding SelectedPreset}"
-                                                          ItemContainerStyle="{StaticResource ModernComboBoxItem}"
-                                                          Style="{StaticResource ModernComboBox}" Margin="0,0,8,0"/>
+                                                <ComboBox Grid.Column="0" ItemsSource="{Binding PresetNames}" SelectedItem="{Binding SelectedPreset}"
+                                                          ItemContainerStyle="{StaticResource ModernComboBoxItem}" Style="{StaticResource ModernComboBox}" Margin="0,0,8,0"/>
                                                 <Button Grid.Column="1" Content="&#x1F4C2;" Command="{Binding LoadPresetCommand}"
                                                         Style="{StaticResource AccentButton}" Width="40" Padding="0" Margin="0,0,4,0" FontSize="14"/>
                                                 <Button Grid.Column="2" Content="&#x1F4BE;" Command="{Binding SavePresetCommand}"
                                                         Style="{StaticResource ModernButton}" Width="40" Padding="0" Margin="0,0,4,0" FontSize="14"/>
                                                 <Button Grid.Column="3" Content="&#x1F5D1;&#xFE0F;" Command="{Binding DeletePresetCommand}"
                                                         Style="{StaticResource DangerButton}" Width="40" Padding="0" FontSize="14"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+
+                        <!-- ГОЛОС -->
+                        <TabItem Header="ГОЛОС" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}" Padding="16">
+                                <StackPanel>
+                                    <!-- Voice Morphing -->
+                                    <Border Style="{StaticResource CardBorder}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="ИЗМЕНЕНИЕ ГОЛОСА" Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="Bold" Margin="0,0,0,0"/>
+                                                <ToggleButton IsChecked="{Binding PitchEnabled}" HorizontalAlignment="Right"
+                                                              Width="44" Height="24" Cursor="Hand">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border x:Name="track" CornerRadius="12" Background="#2A2A5A" Width="44" Height="24">
+                                                                <Ellipse x:Name="thumb" Width="18" Height="18"
+                                                                         Fill="{StaticResource TextSecondaryBrush}"
+                                                                         HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter TargetName="track" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                    <Setter TargetName="thumb" Property="Fill" Value="White"/>
+                                                                    <Setter TargetName="thumb" Property="HorizontalAlignment" Value="Right"/>
+                                                                    <Setter TargetName="thumb" Property="Margin" Value="0,0,3,0"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                            </Grid>
+                                            <Grid Margin="0,12,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="55"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Высота" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Column="1" Minimum="0.5" Maximum="2.0" Value="{Binding PitchRatio}"
+                                                        Style="{StaticResource AccentSlider}" TickFrequency="0.05"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding PitchRatio, StringFormat='{}{0:F2}x'}"
+                                                           Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11" FontWeight="Bold"/>
+                                            </Grid>
+                                            <TextBlock Text="0.5x = низкий голос | 1.0x = оригинал | 2.0x = высокий голос"
+                                                       Foreground="{StaticResource TextSecondaryBrush}" FontSize="9" Margin="0,8,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Auto Gain -->
+                                    <Border Style="{StaticResource CardBorder}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="АВТОУСИЛЕНИЕ (AGC)" Foreground="{StaticResource WarningBrush}" FontSize="11" FontWeight="Bold"/>
+                                                <ToggleButton IsChecked="{Binding AutoGainEnabled}" HorizontalAlignment="Right"
+                                                              Width="44" Height="24" Cursor="Hand">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border x:Name="track" CornerRadius="12" Background="#2A2A5A" Width="44" Height="24">
+                                                                <Ellipse x:Name="thumb" Width="18" Height="18"
+                                                                         Fill="{StaticResource TextSecondaryBrush}"
+                                                                         HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter TargetName="track" Property="Background" Value="{StaticResource WarningBrush}"/>
+                                                                    <Setter TargetName="thumb" Property="Fill" Value="White"/>
+                                                                    <Setter TargetName="thumb" Property="HorizontalAlignment" Value="Right"/>
+                                                                    <Setter TargetName="thumb" Property="Margin" Value="0,0,3,0"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                            </Grid>
+                                            <Grid Margin="0,12,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="55"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Цель" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="0.05" Maximum="1.0" Value="{Binding AutoGainTargetLevel}" Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding AutoGainTargetLevel, StringFormat='{}{0:F2}'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Макс. усиление" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="2" Maximum="40" Value="{Binding AutoGainMaxGain}" Style="{StaticResource ModernSlider}" TickFrequency="1"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding AutoGainMaxGain, StringFormat='{}{0:F0}x'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Атака" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="100" Value="{Binding AutoGainAttackMs}" Style="{StaticResource ModernSlider}" TickFrequency="1"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding AutoGainAttackMs, StringFormat='{}{0:F0} мс'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Затухание" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="3" Grid.Column="1" Minimum="10" Maximum="1000" Value="{Binding AutoGainReleaseMs}" Style="{StaticResource ModernSlider}" TickFrequency="10"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding AutoGainReleaseMs, StringFormat='{}{0:F0} мс'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+
+                        <!-- ПРОСТРАНСТВЕННЫЙ ЗВУК -->
+                        <TabItem Header="ПРОСТРАНСТВО" Style="{StaticResource ModernTabItem}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource BgMidBrush}" Padding="16">
+                                <StackPanel>
+                                    <!-- Reverb -->
+                                    <Border Style="{StaticResource CardBorder}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="РЕВЕРБЕРАЦИЯ" Foreground="{StaticResource PrimaryBrush}" FontSize="11" FontWeight="Bold"/>
+                                                <ToggleButton IsChecked="{Binding ReverbEnabled}" HorizontalAlignment="Right"
+                                                              Width="44" Height="24" Cursor="Hand">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border x:Name="track" CornerRadius="12" Background="#2A2A5A" Width="44" Height="24">
+                                                                <Ellipse x:Name="thumb" Width="18" Height="18"
+                                                                         Fill="{StaticResource TextSecondaryBrush}"
+                                                                         HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter TargetName="track" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                                                                    <Setter TargetName="thumb" Property="Fill" Value="White"/>
+                                                                    <Setter TargetName="thumb" Property="HorizontalAlignment" Value="Right"/>
+                                                                    <Setter TargetName="thumb" Property="Margin" Value="0,0,3,0"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                            </Grid>
+                                            <Grid Margin="0,12,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="55"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Смешивание" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding ReverbWetMix}" Style="{StaticResource PurpleSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ReverbWetMix, StringFormat='{}{0:F0}%'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Размер" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="0.1" Maximum="0.99" Value="{Binding ReverbRoomSize}" Style="{StaticResource PurpleSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ReverbRoomSize, StringFormat='{}{0:F2}'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Затухание" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding ReverbDamping}" Style="{StaticResource PurpleSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding ReverbDamping, StringFormat='{}{0:F2}'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Echo/Delay -->
+                                    <Border Style="{StaticResource CardBorder}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <TextBlock Text="ЭХО / ДЕЛАЙ" Foreground="{StaticResource SuccessBrush}" FontSize="11" FontWeight="Bold"/>
+                                                <ToggleButton IsChecked="{Binding EchoEnabled}" HorizontalAlignment="Right"
+                                                              Width="44" Height="24" Cursor="Hand">
+                                                    <ToggleButton.Template>
+                                                        <ControlTemplate TargetType="ToggleButton">
+                                                            <Border x:Name="track" CornerRadius="12" Background="#2A2A5A" Width="44" Height="24">
+                                                                <Ellipse x:Name="thumb" Width="18" Height="18"
+                                                                         Fill="{StaticResource TextSecondaryBrush}"
+                                                                         HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsChecked" Value="True">
+                                                                    <Setter TargetName="track" Property="Background" Value="{StaticResource SuccessBrush}"/>
+                                                                    <Setter TargetName="thumb" Property="Fill" Value="White"/>
+                                                                    <Setter TargetName="thumb" Property="HorizontalAlignment" Value="Right"/>
+                                                                    <Setter TargetName="thumb" Property="Margin" Value="0,0,3,0"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </ToggleButton.Template>
+                                                </ToggleButton>
+                                            </Grid>
+                                            <Grid Margin="0,12,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="55"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Задержка" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="0" Grid.Column="1" Minimum="10" Maximum="1000" Value="{Binding EchoDelayMs}" Style="{StaticResource ModernSlider}" TickFrequency="5"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding EchoDelayMs, StringFormat='{}{0:F0} мс'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Обратная связь" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="0.9" Value="{Binding EchoFeedback}" Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding EchoFeedback, StringFormat='{}{0:F0}%'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Смешивание" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" FontSize="11"/>
+                                                <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding EchoWetMix}" Style="{StaticResource ModernSlider}" TickFrequency="0.01"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding EchoWetMix, StringFormat='{}{0:F0}%'}" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" TextAlignment="Right" FontSize="11"/>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
@@ -490,17 +654,9 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="&#x1F4CA; СПЕКТР" Foreground="{StaticResource TextSecondaryBrush}"
+                            <TextBlock Text="СПЕКТР" Foreground="{StaticResource TextSecondaryBrush}"
                                        FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
-                            <TextBlock Grid.Column="1" Text="ОШИБКА" Foreground="{StaticResource TextSecondaryBrush}"
-                                       FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
-                            <Canvas x:Name="SpectrumCanvas" Grid.Row="1" Grid.ColumnSpan="2" Background="Transparent"/>
-                            <Canvas x:Name="WaveformCanvas" Grid.Row="1" Grid.ColumnSpan="2" Background="Transparent"
-                                    Visibility="Collapsed"/>
+                            <Canvas x:Name="SpectrumCanvas" Grid.Row="1" Background="Transparent"/>
                         </Grid>
                     </Border>
                 </Grid>
@@ -514,7 +670,6 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
                     <Ellipse x:Name="StatusIndicator" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center">
                         <Ellipse.Style>
                             <Style TargetType="Ellipse">
@@ -529,15 +684,10 @@
                                 </Style.Triggers>
                             </Style>
                         </Ellipse.Style>
-                        <Ellipse.Effect>
-                            <DropShadowEffect x:Name="StatusGlow" BlurRadius="0" ShadowDepth="0" Color="#00B894" Opacity="0"/>
-                        </Ellipse.Effect>
                     </Ellipse>
-
                     <TextBlock Grid.Column="1" Text="{Binding StatusMessage}"
                                Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Column="2" Text="MICSTUDIO PRO v2.0"
+                    <TextBlock Grid.Column="2" Text="MICSTUDIO PRO v3.0"
                                Foreground="#444466" FontSize="10" VerticalAlignment="Center"/>
                 </Grid>
             </Border>

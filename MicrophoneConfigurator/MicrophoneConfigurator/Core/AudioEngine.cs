@@ -17,11 +17,15 @@ namespace MicrophoneConfigurator.Core
 
         private VolumeSampleProvider? _volumeProvider;
         private Equalizer? _equalizer;
+        private PitchShifterSampleProvider? _pitchShifter;
+        private NoiseGateSampleProvider? _noiseGate;
         private CompressorSampleProvider? _compressor;
         private LimiterSampleProvider? _limiter;
-        private NoiseGateSampleProvider? _noiseGate;
-        private WaveInProvider? _waveInProvider;
+        private ReverbSampleProvider? _reverb;
+        private EchoDelaySampleProvider? _echoDelay;
+        private AutoGainSampleProvider? _autoGain;
         private RecordingSampleProvider? _recordingProvider;
+        private WaveInProvider? _waveInProvider;
 
         private readonly object _lock = new();
         private bool _disposed;
@@ -39,6 +43,7 @@ namespace MicrophoneConfigurator.Core
         public float[] SpectrumData { get; private set; } = new float[64];
         public float[] WaveformData { get; private set; } = new float[256];
         public float GainReduction { get; private set; }
+        public float CurrentAutoGain { get; private set; }
 
         public event Action? AudioDataAvailable;
         public event Action? DeviceChanged;
@@ -131,20 +136,45 @@ namespace MicrophoneConfigurator.Core
 
                     _waveInProvider = new WaveInProvider(_waveIn);
 
-                    _volumeProvider = new VolumeSampleProvider(_waveInProvider.ToSampleProvider())
+                    ISampleProvider chain = _waveInProvider.ToSampleProvider();
+
+                    _volumeProvider = new VolumeSampleProvider(chain) { Volume = Volume };
+                    chain = _volumeProvider;
+
+                    _autoGain = new AutoGainSampleProvider(chain);
+                    chain = _autoGain;
+
+                    _equalizer = new Equalizer(chain, 44100);
+                    chain = _equalizer;
+
+                    _pitchShifter = new PitchShifterSampleProvider(chain);
+                    chain = _pitchShifter;
+
+                    _noiseGate = new NoiseGateSampleProvider(chain);
+                    chain = _noiseGate;
+
+                    _compressor = new CompressorSampleProvider(chain);
+                    chain = _compressor;
+
+                    _limiter = new LimiterSampleProvider(chain);
+                    chain = _limiter;
+
+                    _reverb = new ReverbSampleProvider(chain);
+                    chain = _reverb;
+
+                    _echoDelay = new EchoDelaySampleProvider(chain);
+                    chain = _echoDelay;
+
+                    _recordingProvider = new RecordingSampleProvider(chain);
+                    _recordingProvider.GainReductionCalculated += gr =>
                     {
-                        Volume = Volume
+                        GainReduction = gr;
+                        if (_autoGain != null)
+                            CurrentAutoGain = _autoGain.CurrentGain;
                     };
+                    chain = _recordingProvider;
 
-                    _equalizer = new Equalizer(_volumeProvider, 44100);
-                    _noiseGate = new NoiseGateSampleProvider(_equalizer);
-                    _compressor = new CompressorSampleProvider(_noiseGate);
-                    _limiter = new LimiterSampleProvider(_compressor);
-
-                    _recordingProvider = new RecordingSampleProvider(_limiter);
-                    _recordingProvider.GainReductionCalculated += gr => GainReduction = gr;
-
-                    var spectrumAnalyzer = new SpectrumAnalyzerSampleProvider(_recordingProvider);
+                    var spectrumAnalyzer = new SpectrumAnalyzerSampleProvider(chain);
                     spectrumAnalyzer.SpectrumCalculated += (spectrum, waveform) =>
                     {
                         SpectrumData = spectrum;
@@ -240,6 +270,49 @@ namespace MicrophoneConfigurator.Core
                 _noiseGate.Attack = attack;
                 _noiseGate.Release = release;
                 _noiseGate.Enabled = enabled;
+            }
+        }
+
+        public void SetPitchSettings(float ratio, bool enabled)
+        {
+            if (_pitchShifter != null)
+            {
+                _pitchShifter.PitchRatio = ratio;
+                _pitchShifter.Enabled = enabled;
+            }
+        }
+
+        public void SetReverbSettings(float wetMix, float roomSize, float damping, bool enabled)
+        {
+            if (_reverb != null)
+            {
+                _reverb.WetMix = wetMix;
+                _reverb.RoomSize = roomSize;
+                _reverb.Damping = damping;
+                _reverb.Enabled = enabled;
+            }
+        }
+
+        public void SetEchoSettings(float delayMs, float feedback, float wetMix, bool enabled)
+        {
+            if (_echoDelay != null)
+            {
+                _echoDelay.DelayMs = delayMs;
+                _echoDelay.Feedback = feedback;
+                _echoDelay.WetMix = wetMix;
+                _echoDelay.Enabled = enabled;
+            }
+        }
+
+        public void SetAutoGainSettings(float targetLevel, float maxGain, float attackMs, float releaseMs, bool enabled)
+        {
+            if (_autoGain != null)
+            {
+                _autoGain.TargetLevel = targetLevel;
+                _autoGain.MaxGain = maxGain;
+                _autoGain.AttackMs = attackMs;
+                _autoGain.ReleaseMs = releaseMs;
+                _autoGain.Enabled = enabled;
             }
         }
 
@@ -353,44 +426,32 @@ namespace MicrophoneConfigurator.Core
             SetVolume(preset.Volume);
 
             for (int i = 0; i < preset.EqualizerBands.Length && i < 10; i++)
-            {
                 SetEqualizerBand(i, preset.EqualizerBands[i]);
-            }
 
-            SetCompressorSettings(
-                preset.CompressorThreshold,
-                preset.CompressorRatio,
-                preset.CompressorAttack,
-                preset.CompressorRelease
-            );
-
+            SetCompressorSettings(preset.CompressorThreshold, preset.CompressorRatio, preset.CompressorAttack, preset.CompressorRelease);
             SetLimiterSettings(preset.LimiterThreshold, preset.LimiterRelease);
             SetNoiseGateSettings(preset.NoiseGateThreshold, preset.NoiseGateAttack, preset.NoiseGateRelease);
+            SetPitchSettings(preset.PitchRatio, preset.PitchEnabled);
+            SetReverbSettings(preset.ReverbWetMix, preset.ReverbRoomSize, preset.ReverbDamping, preset.ReverbEnabled);
+            SetEchoSettings(preset.EchoDelayMs, preset.EchoFeedback, preset.EchoWetMix, preset.EchoEnabled);
+            SetAutoGainSettings(preset.AutoGainTargetLevel, preset.AutoGainMaxGain, preset.AutoGainAttackMs, preset.AutoGainReleaseMs, preset.AutoGainEnabled);
         }
 
         private int GetInputDeviceIndex()
         {
             if (SelectedInputDevice == null) return 0;
-
             var devices = _deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
             for (int i = 0; i < devices.Count; i++)
-            {
-                if (devices[i].ID == SelectedInputDevice.Id)
-                    return i;
-            }
+                if (devices[i].ID == SelectedInputDevice.Id) return i;
             return 0;
         }
 
         private int GetOutputDeviceIndex()
         {
             if (SelectedOutputDevice == null) return 0;
-
             var devices = _deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
             for (int i = 0; i < devices.Count; i++)
-            {
-                if (devices[i].ID == SelectedOutputDevice.Id)
-                    return i;
-            }
+                if (devices[i].ID == SelectedOutputDevice.Id) return i;
             return 0;
         }
 

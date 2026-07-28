@@ -15,7 +15,11 @@ namespace MicrophoneConfigurator
         private MainViewModel _viewModel;
         private DispatcherTimer _visualizationTimer;
         private float[] _smoothedSpectrum;
-        private const int SpectrumSmoothing = 3;
+        private float[] _peakHold;
+        private float[] _peakDecay;
+        private double _vuLeftPeak;
+        private double _vuRightPeak;
+        private DispatcherTimer _peakDecayTimer;
 
         public MainWindow()
         {
@@ -25,15 +29,18 @@ namespace MicrophoneConfigurator
             DataContext = _viewModel;
 
             _smoothedSpectrum = new float[64];
+            _peakHold = new float[64];
+            _peakDecay = new float[64];
 
             _viewModel.AudioDataUpdated += OnAudioDataUpdated;
 
-            _visualizationTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(33)
-            };
+            _visualizationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(30) };
             _visualizationTimer.Tick += (s, e) => RedrawVisualization();
             _visualizationTimer.Start();
+
+            _peakDecayTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            _peakDecayTimer.Tick += (s, e) => DecayPeaks();
+            _peakDecayTimer.Start();
 
             Loaded += (s, e) => _viewModel.RefreshDevicesCommand.Execute(null);
         }
@@ -61,13 +68,9 @@ namespace MicrophoneConfigurator
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
-            {
                 WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-            }
             else
-            {
                 DragMove();
-            }
         }
 
         private void MinimizeBtn_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
@@ -81,10 +84,24 @@ namespace MicrophoneConfigurator
         private void RedrawVisualization()
         {
             if (_viewModel == null) return;
-
             UpdateVuMeter(_viewModel.SpectrumData);
             DrawSpectrum(_viewModel.SpectrumData);
             UpdateGainReduction();
+        }
+
+        private void DecayPeaks()
+        {
+            for (int i = 0; i < _peakHold.Length; i++)
+            {
+                _peakHold[i] *= 0.95f;
+                if (_peakHold[i] < 0.01f) _peakHold[i] = 0;
+            }
+
+            double decayRate = 0.92;
+            _vuLeftPeak *= decayRate;
+            _vuRightPeak *= decayRate;
+            if (_vuLeftPeak < 0.5) VuLeftPeak.Height = 0;
+            if (_vuRightPeak < 0.5) VuRightPeak.Height = 0;
         }
 
         private void UpdateVuMeter(float[] data)
@@ -96,34 +113,31 @@ namespace MicrophoneConfigurator
                 level += data[i];
             level /= data.Length;
 
-            double height = Math.Min(level * 350, 120);
+            double height = Math.Min(level * 350, 130);
+            double db = level > 0 ? 20 * Math.Log10(level) : -60;
 
             VuLeftBar.Height = height;
             VuRightBar.Height = height * 0.95;
 
-            double db = level > 0 ? 20 * Math.Log10(level) : -60;
+            double peakHeight = Math.Max(height, VuLeftPeak.Height);
+            VuLeftPeak.Height = peakHeight;
+            VuRightPeak.Height = peakHeight * 0.95;
+
             VuPeakLabel.Text = $"{db:F0} dB";
 
             if (db > -6)
-            {
                 VuPeakLabel.Foreground = new SolidColorBrush(Colors.Red);
-            }
             else if (db > -18)
-            {
                 VuPeakLabel.Foreground = new SolidColorBrush(Color.FromRgb(253, 203, 110));
-            }
             else
-            {
                 VuPeakLabel.Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 170));
-            }
         }
 
         private void UpdateGainReduction()
         {
             float gr = _viewModel.GainReduction;
             double normalized = Math.Max(0, Math.Min(1, (-gr) / 30.0));
-
-            double maxWidth = 180;
+            double maxWidth = 198;
             GainReductionBar.Width = normalized * maxWidth;
             GainReductionLabel.Text = $"{gr:F1} dB";
         }
@@ -149,10 +163,27 @@ namespace MicrophoneConfigurator
                 float target = raw * 3.5f;
                 target = Math.Min(target, 1.0f);
 
-                _smoothedSpectrum[i] += (target - _smoothedSpectrum[i]) * 0.4f;
+                _smoothedSpectrum[i] += (target - _smoothedSpectrum[i]) * 0.35f;
+
+                if (_smoothedSpectrum[i] > _peakHold[i])
+                {
+                    _peakHold[i] = _smoothedSpectrum[i];
+                }
 
                 double height = _smoothedSpectrum[i] * canvasHeight;
-                height = Math.Max(height, 3);
+                height = Math.Max(height, 2);
+
+                double peakHeight = _peakHold[i] * canvasHeight;
+                peakHeight = Math.Max(peakHeight, 2);
+
+                double ratio = _smoothedSpectrum[i];
+                Color barColor;
+                if (ratio < 0.33)
+                    barColor = ColorExtensions.Lerp(Color.FromRgb(0, 206, 201), Color.FromRgb(108, 92, 231), ratio * 3);
+                else if (ratio < 0.66)
+                    barColor = ColorExtensions.Lerp(Color.FromRgb(108, 92, 231), Color.FromRgb(253, 203, 110), (ratio - 0.33f) * 3);
+                else
+                    barColor = ColorExtensions.Lerp(Color.FromRgb(253, 203, 110), Color.FromRgb(255, 107, 107), (ratio - 0.66f) * 3);
 
                 var bar = new System.Windows.Shapes.Rectangle
                 {
@@ -162,38 +193,35 @@ namespace MicrophoneConfigurator
                     RadiusY = 2,
                 };
 
-                double ratio = _smoothedSpectrum[i];
-                Color barColor;
-                if (ratio < 0.5)
-                {
-                    barColor = ColorExtensions.Lerp(Color.FromRgb(0, 206, 201), Color.FromRgb(108, 92, 231), ratio * 2);
-                }
-                else if (ratio < 0.8)
-                {
-                    barColor = ColorExtensions.Lerp(Color.FromRgb(108, 92, 231), Color.FromRgb(253, 203, 110), (ratio - 0.5f) * 3.33f);
-                }
-                else
-                {
-                    barColor = ColorExtensions.Lerp(Color.FromRgb(253, 203, 110), Color.FromRgb(255, 107, 107), (ratio - 0.8f) * 5);
-                }
-
                 bar.Fill = new LinearGradientBrush(
                     barColor,
-                    Color.FromArgb(40, barColor.R, barColor.G, barColor.B),
+                    Color.FromArgb(30, barColor.R, barColor.G, barColor.B),
                     90);
 
                 bar.Effect = new DropShadowEffect
                 {
                     Color = barColor,
-                    BlurRadius = 8,
+                    BlurRadius = 10,
                     ShadowDepth = 0,
-                    Opacity = 0.3
+                    Opacity = 0.35
                 };
 
                 Canvas.SetLeft(bar, i * barWidth + gap / 2);
                 Canvas.SetBottom(bar, 0);
-
                 SpectrumCanvas.Children.Add(bar);
+
+                var peakLine = new System.Windows.Shapes.Rectangle
+                {
+                    Width = barWidth - gap,
+                    Height = 2,
+                    RadiusX = 1,
+                    RadiusY = 1,
+                    Fill = new SolidColorBrush(Color.FromArgb(180, 255, 255, 255))
+                };
+
+                Canvas.SetLeft(peakLine, i * barWidth + gap / 2);
+                Canvas.SetBottom(peakLine, peakHeight);
+                SpectrumCanvas.Children.Add(peakLine);
             }
         }
     }

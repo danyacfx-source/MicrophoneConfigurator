@@ -576,6 +576,58 @@
         </Setter>
     </Style>
 
+    <!-- Accent Slider (for Voice tab) -->
+    <Style x:Key="AccentSlider" TargetType="Slider">
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="1"/>
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border CornerRadius="4" Height="6"
+                                                    Background="{StaticResource SuccessBrush}"
+                                                    VerticalAlignment="Center"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border CornerRadius="4" Height="6"
+                                                    Background="#2A2A5A"
+                                                    VerticalAlignment="Center"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Ellipse Width="16" Height="16" Fill="{StaticResource SuccessBrush}">
+                                                <Ellipse.Effect>
+                                                    <DropShadowEffect BlurRadius="8" ShadowDepth="0" Color="#00B894" Opacity="0.5"/>
+                                                </Ellipse.Effect>
+                                            </Ellipse>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- InvertConverter -->
     <local:InvertConverter x:Key="InvertConverter" xmlns:local="clr-namespace:MicrophoneConfigurator"/>
 
